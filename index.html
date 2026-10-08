@@ -1001,9 +1001,19 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
         <div class="fr-action-row">
           <label>اکشن:</label>
           <select id="frAction" class="btn sm">
-            <option value="replaceAll">replaceAll — جایگزینی همه</option>
-            <option value="replace">replace — جایگزینی اولین</option>
-            <option value="replaceRegex">replaceRegex — Regex</option>
+            <optgroup label="متنی">
+              <option value="replaceAll">replaceAll — جایگزینی همه</option>
+              <option value="replace">replace — جایگزینی اولین</option>
+              <option value="replaceRegex">replaceRegex — Regex</option>
+            </optgroup>
+            <optgroup label="هدف‌دار">
+              <option value="replaceClass">replaceClass — جایگزینی کلاس</option>
+              <option value="replaceFunction">replaceFunction — جایگزینی متد</option>
+              <option value="replaceElement">replaceElement — جایگزینی المان</option>
+              <option value="insertBefore">insertBefore — درج قبل</option>
+              <option value="insertAfter">insertAfter — درج بعد</option>
+              <option value="delete">delete — حذف</option>
+            </optgroup>
           </select>
 
           <label>هدف:</label>
