@@ -1001,19 +1001,12 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
         <div class="fr-action-row">
           <label>اکشن:</label>
           <select id="frAction" class="btn sm">
-            <optgroup label="متنی">
-              <option value="replaceAll">replaceAll — جایگزینی همه</option>
-              <option value="replace">replace — جایگزینی اولین</option>
-              <option value="replaceRegex">replaceRegex — Regex</option>
-            </optgroup>
-            <optgroup label="هدف‌دار">
-              <option value="replaceClass">replaceClass — جایگزینی کلاس</option>
-              <option value="replaceFunction">replaceFunction — جایگزینی متد</option>
-              <option value="replaceElement">replaceElement — جایگزینی المان</option>
-              <option value="insertBefore">insertBefore — درج قبل</option>
-              <option value="insertAfter">insertAfter — درج بعد</option>
-              <option value="delete">delete — حذف</option>
-            </optgroup>
+            <option value="replaceAll">replaceAll — جایگزینی</option>
+            <option value="replace">replace — جایگزینی اولین</option>
+            <option value="replaceRegex">replaceRegex — Regex (فقط متن)</option>
+            <option value="insertBefore">insertBefore — درج قبل</option>
+            <option value="insertAfter">insertAfter — درج بعد</option>
+            <option value="delete">delete — حذف</option>
           </select>
 
           <label>هدف:</label>
@@ -1042,10 +1035,10 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
         <!-- Find/Replace -->
         <div class="fr-grid" id="frTextRow">
           <div class="fr-field">
-            <label>Find (متن چندخطی · Regex مجاز)</label>
+            <label id="frFindLabel">Find (متن جستجو)</label>
             <textarea id="findInput" spellcheck="false" placeholder="متن جستجو..."></textarea>
           </div>
-          <div class="fr-field">
+          <div class="fr-field" id="frReplaceField">
             <label>Replace (پشتیبانی از $1, $&amp;, ...)</label>
             <textarea id="replaceInput" spellcheck="false" placeholder="متن جایگزین..."></textarea>
           </div>
@@ -1080,7 +1073,7 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
       </div>
       <div class="fr-preview" id="frPreview"></div>
     </section>
-
+    
     <!-- COMMANDS -->
     <section class="panel" id="panel-commands" data-h="10">
       <div class="panel-head">
@@ -3920,12 +3913,15 @@ class FindBar {
     this.textRow.style.display = isTextTarget ? 'grid' : 'none';
 
     // ردیف Insert/Replace
+    // ✅ نمایش برای همه‌ی اکشن‌ها وقتی هدف ≠ متن
     const needsContent = (
-      action === 'insertBefore' ||
-      action === 'insertAfter' ||
+      action === 'replace' ||
+      action === 'replaceAll' ||
       action === 'replaceClass' ||
       action === 'replaceFunction' ||
-      action === 'replaceElement'
+      action === 'replaceElement' ||
+      action === 'insertBefore' ||
+      action === 'insertAfter'
     );
     this.insertRow.style.display = (!isTextTarget && needsContent) ? 'grid' : 'none';
 
@@ -3935,6 +3931,8 @@ class FindBar {
       const labelMap = {
         insertBefore: 'متن درج قبل',
         insertAfter: 'متن درج بعد',
+        replace: 'متن جایگزین',
+        replaceAll: 'متن جایگزین',
         replaceClass: 'کلاس جدید',
         replaceFunction: 'متد جدید',
         replaceElement: 'المان جدید'
@@ -3952,23 +3950,18 @@ class FindBar {
 
   /**
    * چک کن آیا اکشن به یک هدف خاص قفل است
+   * ✅ فقط replaceRegex روی متن قفل است
    */
   _isLockedAction(action){
-    return ['replaceAll', 'replace', 'replaceRegex',
-            'replaceClass', 'replaceFunction', 'replaceElement'].includes(action);
+    return action === 'replaceRegex';
   }
 
   /**
    * هدف قفل‌شده برای اکشن
    */
   _getLockedTarget(action){
-    if(action === 'replaceAll' || action === 'replace' || action === 'replaceRegex'){
-      return 'text';
-    }
-    if(action === 'replaceClass') return 'class';
-    if(action === 'replaceFunction') return 'function';
-    if(action === 'replaceElement') return 'element';
-    return 'text';
+    if(action === 'replaceRegex') return 'text';
+    return null;
   }
   /**
    * بازسازی Dropdown اکشن بر اساس هدف
@@ -4154,11 +4147,33 @@ class FindBar {
 
   /**
    * ساخت cmd از فیلدهای FindBar
+   * ✅ ترجمه‌ی اکشن + هدف به اکشن نهایی
    */
   _buildCommand(){
     const action = this.actionSelect.value;
     const target = this.targetSelect.value;
-    const cmd = { action: action };
+
+    // ✅ مرحله ۱: ترجمه‌ی اکشن بر اساس هدف
+    let finalAction = action;
+
+    if(target !== 'text'){
+      // هدف ≠ متن
+      if(action === 'replace' || action === 'replaceAll'){
+        // replace/replaceAll + هدف ≠ متن → replaceClass/Function/Element
+        if(target === 'class') finalAction = 'replaceClass';
+        else if(target === 'function') finalAction = 'replaceFunction';
+        else if(target === 'element') finalAction = 'replaceElement';
+      }
+      // insertBefore/insertAfter/delete → همان‌ها می‌مانند
+    } else {
+      // هدف = متن
+      // replaceClass/Function/Element (اگر از _sendToFind بیاید) → replace
+      if(action === 'replaceClass' || action === 'replaceFunction' || action === 'replaceElement'){
+        finalAction = 'replace';
+      }
+    }
+
+    const cmd = { action: finalAction };
 
     if(target === 'text'){
       cmd.find = this.findInput.value;
@@ -4176,7 +4191,8 @@ class FindBar {
       }
       if(action === 'insertBefore' || action === 'insertAfter'){
         cmd.insert = this.insertInput.value;
-      } else if(action === 'replaceClass' || action === 'replaceFunction' || action === 'replaceElement'){
+      } else {
+        // replace/replaceAll + هدف ≠ متن → replace
         cmd.replace = this.insertInput.value;
       }
     }
@@ -4650,9 +4666,9 @@ class ResultsPanel {
         'insertBefore': 'insertBefore',
         'insertAfter': 'insertAfter',
         'delete': 'delete',
-        'replaceClass': 'replaceClass',
-        'replaceFunction': 'replaceFunction',
-        'replaceElement': 'replaceElement'
+        'replaceClass': 'replace',
+        'replaceFunction': 'replace',
+        'replaceElement': 'replace'
       };
       if(actionMap[cmd.action]){
         fb.actionSelect.value = actionMap[cmd.action];
