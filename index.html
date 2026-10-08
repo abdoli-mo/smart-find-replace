@@ -1001,19 +1001,9 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
         <div class="fr-action-row">
           <label>اکشن:</label>
           <select id="frAction" class="btn sm">
-            <optgroup label="متنی">
-              <option value="replaceAll">replaceAll (جایگزینی همه)</option>
-              <option value="replace">replace (اولین)</option>
-              <option value="replaceRegex">replaceRegex (Regex)</option>
-            </optgroup>
-            <optgroup label="هدف‌دار">
-              <option value="insertBefore">insertBefore (درج قبل)</option>
-              <option value="insertAfter">insertAfter (درج بعد)</option>
-              <option value="replaceClass">replaceClass (جایگزینی کلاس)</option>
-              <option value="replaceFunction">replaceFunction (جایگزینی متد)</option>
-              <option value="replaceElement">replaceElement (جایگزینی المان)</option>
-              <option value="delete">delete (حذف)</option>
-            </optgroup>
+            <option value="replaceAll">replaceAll — جایگزینی همه</option>
+            <option value="replace">replace — جایگزینی اولین</option>
+            <option value="replaceRegex">replaceRegex — Regex</option>
           </select>
 
           <label>هدف:</label>
@@ -1023,11 +1013,9 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
             <option value="function">متد</option>
             <option value="element">المان</option>
           </select>
-
-          <button class="btn sm primary" id="frExecute">▶️ اجرا</button>
         </div>
 
-        <!-- Target Name + IN_CLASS (وقتی هدف ≠ متن) -->
+        <!-- Target Name + IN_CLASS -->
         <div class="fr-target-row" id="frTargetRow" style="display:none">
           <label>نام هدف:</label>
           <div class="autocomplete-wrap">
@@ -1041,7 +1029,7 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
           </div>
         </div>
 
-        <!-- Find/Replace (حالت متنی) -->
+        <!-- Find/Replace -->
         <div class="fr-grid" id="frTextRow">
           <div class="fr-field">
             <label>Find (متن چندخطی · Regex مجاز)</label>
@@ -1053,10 +1041,10 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
           </div>
         </div>
 
-        <!-- Insert/Replace (وقتی هدف ≠ متن) -->
+        <!-- Insert/Replace (هدف‌دار) -->
         <div class="fr-grid" id="frInsertRow" style="display:none">
           <div class="fr-field" style="grid-column:1/-1">
-            <label id="frInsertLabel">متن درج (Insert)</label>
+            <label id="frInsertLabel">متن درج</label>
             <textarea id="frInsertInput" spellcheck="false" placeholder="متن برای درج/جایگزینی..."></textarea>
           </div>
         </div>
@@ -1069,9 +1057,11 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
         </div>
 
         <div class="fr-actions">
+          <button class="btn sm primary" id="frExecute">▶️ اجرا</button>
+          <button class="btn sm" id="btnAnalyzeFind">📋 تحلیل</button>
+          <span style="width:1px;height:20px;background:var(--border)"></span>
           <button class="btn sm" id="btnFindPrev">◀ قبلی</button>
           <button class="btn sm" id="btnFindNext">بعدی ▶</button>
-          <button class="btn sm" id="btnReplaceOne">⬇️ جایگزین</button>
           <button class="btn sm primary" id="btnReplaceAll">⬇️⬇️ همه</button>
           <button class="btn sm" id="btnCount">🔍 شمارش</button>
           <button class="btn sm" id="btnPreview">👁 پیش‌نمایش</button>
@@ -1083,21 +1073,21 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
 
     <!-- COMMANDS -->
     <section class="panel" id="panel-commands" data-h="10">
-<div class="panel-head">
-  📝 دستورات (JSON یا DSL)
-  <span class="tag" id="cmdTag">0 دستور</span>
-  <div class="spacer"></div>
-  <button class="btn sm" id="btnModeFromCmd">📝 حالت ساده ▴</button>
-  <button class="btn sm" id="btnPaste">📥 چسباندن</button>
-      <button class="btn sm ghost" id="btnClearCmd" title="پاک کردن">🗑 پاک</button>
-    <button class="btn sm primary" id="btnSnip">💾 اسنیپت</button>
-
-</div>
- <div class="panel-body">
-  <!-- ✅ فقط یک div خالی که کلاس آن را مدیریت می‌کند -->
-  <div id="commandsEditor"></div>
-  <div class="cmd-hint">پشتیبانی از JSON استاندارد و DSL با بلوک‌های ### — اکشن replaceRegex برای جستجوی Regex</div>
-</div>
+      <div class="panel-head">
+        📝 دستورات (JSON یا DSL)
+        <span class="tag" id="cmdTag">0 دستور</span>
+        <div class="spacer"></div>
+        <button class="btn sm" id="btnModeFromCmd">📝 حالت ساده ▴</button>
+        <button class="btn sm" id="btnPaste">📥 چسباندن</button>
+            <button class="btn sm ghost" id="btnClearCmd" title="پاک کردن">🗑 پاک</button>
+          <button class="btn sm primary" id="btnSnip">💾 اسنیپت</button>
+      
+      </div>
+       <div class="panel-body">
+        <!-- ✅ فقط یک div خالی که کلاس آن را مدیریت می‌کند -->
+        <div id="commandsEditor"></div>
+        <div class="cmd-hint">پشتیبانی از JSON استاندارد و DSL با بلوک‌های ### — اکشن replaceRegex برای جستجوی Regex</div>
+      </div>
     </section>
 
     <!-- ACTION BAR -->
@@ -1267,7 +1257,15 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
       <button class="btn ghost" data-close>بستن</button>
     </div>
   </div>
-</div><div id="toasts"></div>
+</div>
+<style id="frLockedStyles">
+.fr-action-row select.fr-locked{
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #0d1018;
+}
+</style>
+<div id="toasts"></div>
 
 <!-- Settings Modal -->
 <div class="modal-bg" id="settingsModal">
@@ -1425,63 +1423,7 @@ const Utils = {
       }
     });
   },
-
-  /**
-   * کپی به کلیپ‌بورد با fallback
-   */
-  copyToClipboard(text){
-    return new Promise((resolve, reject) => {
-      // ۱. تلاش با Clipboard API
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(text).then(
-          () => resolve(),
-          () => {
-            // ۲. fallback با execCommand
-            const ok = Utils._fallbackCopy(text);
-            ok ? resolve() : reject(new Error('copy failed'));
-          }
-        );
-      } else {
-        // ۲. fallback
-        const ok = Utils._fallbackCopy(text);
-        ok ? resolve() : reject(new Error('copy failed'));
-      }
-    });
-  },
-
-  _fallbackCopy(text){
-    try{
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      ta.style.top = '0';
-      ta.setAttribute('readonly', '');
-      document.body.appendChild(ta);
-      ta.select();
-      ta.setSelectionRange(0, text.length);
-      const ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      return ok;
-    }catch(_){
-      return false;
-    }
-  },
-
-  /**
-   * خواندن از کلیپ‌بورد با fallback (محدود)
-   */
-  readFromClipboard(){
-    return new Promise((resolve, reject) => {
-      if(navigator.clipboard && navigator.clipboard.readText){
-        navigator.clipboard.readText().then(resolve, () => {
-          reject(new Error('دسترسی به کلیپ‌بورد ممکن نشد. از Ctrl+V استفاده کنید.'));
-        });
-      } else {
-        reject(new Error('مرورگر از clipboard API پشتیبانی نمی‌کند. از Ctrl+V استفاده کنید.'));
-      }
-    });
-  },
+  
   esc(s){
     return String(s).replace(/[&<>"']/g, c => ({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
@@ -1542,9 +1484,6 @@ const Toast = {
   info(m){ this.show(m, ''); }
 };
 
-/* ============================================================
-   CLASS 1 · App — هماهنگ‌کننده‌ی اصلی + State
-   ============================================================ */
 /* ============================================================
    CLASS 1 · App — هماهنگ‌کننده‌ی اصلی + State
    ============================================================ */
@@ -2797,271 +2736,391 @@ findWithIgnoreIndent(text, pattern, caseSensitive){
    CLASS 6 · Scanners — اسکن ساختاری کد
    ============================================================ */
 /* ============================================================
-   CLASS · Scanners — اسکن ساختاری کد + جستجوی زمینه‌دار
+   CLASS · Scanners — اسکن ساختاری کد (نسخه بازنویسی‌شده)
+   
+   معماری چهار لایه:
+   ۱. Tokenizer — skip کردن رشته، تمپلیت، کامنت، regex، braces
+   ۲. Finders — پیدا کردن ساختارها (class/function/element/css)
+   ۳. Context — جستجوی زمینه‌دار
+   ۴. Utils — توابع کمکی
+   
+   اصول:
+   - DRY: هر منطق یک بار
+   - findAll* منبع اصلی، find* فقط wrapper
+   - همه‌ی skipها محافظت‌شده با max iteration
    ============================================================ */
 class Scanners {
-  constructor(){}
+  constructor(){
+    this.MAX_ITERATIONS = 100000;
+  }
 
-  /* ============================================================
-     بخش ۱ — توابع پایه (String/Template/Brace)
-     ============================================================ */
+  /* ══════════════════════════════════════════════════════════
+     لایه ۱ — Tokenizer
+     ══════════════════════════════════════════════════════════ */
 
-  skipString(src, i, q){
+  /**
+   * رد کردن یک رشته '...' یا "..."
+   * @returns موقعیت بعد از رشته
+   */
+  skipString(src, i, quote){
     i++;
-    while(i < src.length){
+    let safety = this.MAX_ITERATIONS;
+    while(i < src.length && safety-- > 0){
       const c = src[i];
       if(c === '\\'){ i += 2; continue; }
-      if(c === q) return i + 1;
-      if(c === '\n') return i;
+      if(c === quote) return i + 1;
+      if(c === '\n') return i;   // رشته یک‌خطی است
       i++;
     }
     return i;
   }
 
+  /**
+   * رد کردن template literal `...` با پشتیبانی از ${}
+   */
   skipTemplate(src, i){
     i++;
-    while(i < src.length){
+    let safety = this.MAX_ITERATIONS;
+    while(i < src.length && safety-- > 0){
       const c = src[i];
       if(c === '\\'){ i += 2; continue; }
       if(c === '`') return i + 1;
       if(c === '$' && src[i+1] === '{'){
-        const e = this.scanBrace(src, i + 1, 'js');
+        const e = this.skipBrace(src, i + 1, 'js');
         if(e === -1) return src.length;
-        i = e + 1; continue;
+        i = e + 1;
+        continue;
       }
       i++;
     }
     return i;
   }
 
-  _isRegexStart(src, i){
+  /**
+   * تشخیص اینکه / شروع یک regex است یا تقسیم
+   */
+  isRegexStart(src, i){
     if(src[i] !== '/') return false;
     if(src[i+1] === '/' || src[i+1] === '*') return false;
+
+    // کاراکتر قبلی غیر از whitespace
     let j = i - 1;
     while(j >= 0 && /[ \t\n]/.test(src[j])) j--;
-    if(j < 0) return true;
+    if(j < 0) return true;   // ابتدای فایل
+
     const prev = src[j];
+
+    // بعد از این‌ها regex است
     if(/[=(,:[!&|?{};+\-*%<>~^]/.test(prev)) return true;
+
+    // بعد از کلمات کلیدی
     const before = src.slice(Math.max(0, j - 15), j + 1);
     if(/\b(return|typeof|delete|void|in|of|new|do|else|case|yield|await)\s*$/.test(before)) return true;
+
     return false;
   }
 
-  _skipRegex(src, i){
+  /**
+   * رد کردن یک regex /.../
+   */
+  skipRegex(src, i){
     let j = i + 1;
     let inClass = false;
-    while(j < src.length){
+    let safety = this.MAX_ITERATIONS;
+
+    while(j < src.length && safety-- > 0){
       const c = src[j];
       if(c === '\\'){ j += 2; continue; }
+      if(c === '\n') return j;  // regex یک‌خطی است
       if(c === '[') inClass = true;
       else if(c === ']') inClass = false;
       else if(c === '/' && !inClass) return j + 1;
-      else if(c === '\n') return j;
       j++;
     }
     return j;
   }
 
-  scanBrace(src, openIdx, mode){
-    const isJS = mode !== 'css';
-    let depth = 0, i = openIdx;
-    const n = src.length;
-    while(i < n){
+  /**
+   * رد کردن یک بلوک { ... } با تشخیص عمق
+   * @param mode - 'js' | 'css'
+   */
+  skipBrace(src, openIdx, mode){
+    const isJS = (mode !== 'css');
+    let depth = 0;
+    let i = openIdx;
+    let safety = this.MAX_ITERATIONS;
+
+    while(i < src.length && safety-- > 0){
       const c = src[i];
+
+      // کامنت بلوکی /* */
       if(c === '/' && src[i+1] === '*'){
         const e = src.indexOf('*/', i + 2);
         if(e === -1) return -1;
-        i = e + 2; continue;
+        i = e + 2;
+        continue;
       }
+
+      // کامنت خطی // (فقط در JS)
       if(isJS && c === '/' && src[i+1] === '/'){
         const e = src.indexOf('\n', i + 2);
         if(e === -1) return -1;
-        i = e + 1; continue;
+        i = e + 1;
+        continue;
       }
-      if(c === "'" || c === '"'){ i = this.skipString(src, i, c); continue; }
-      if(isJS && c === '`'){ i = this.skipTemplate(src, i); continue; }
 
-      // تشخیص regex در JS
-      if(isJS && c === '/' && this._isRegexStart(src, i)){
-        const end = this._skipRegex(src, i);
+      // رشته‌ها
+      if(c === "'" || c === '"'){
+        i = this.skipString(src, i, c);
+        continue;
+      }
+
+      // template
+      if(isJS && c === '`'){
+        i = this.skipTemplate(src, i);
+        continue;
+      }
+
+      // regex (فقط در JS)
+      if(isJS && c === '/' && this.isRegexStart(src, i)){
+        const end = this.skipRegex(src, i);
         if(end > i){ i = end; continue; }
       }
 
+      // braces
       if(c === '{'){ depth++; i++; continue; }
       if(c === '}'){ depth--; if(depth === 0) return i; i++; continue; }
+
       i++;
     }
     return -1;
   }
 
-  /* ============================================================
-     بخش ۲ — پیدا کردن ساختارهای JS
-     ============================================================ */
+  /* ══════════════════════════════════════════════════════════
+     لایه ۲ — Finders (findAll* منبع اصلی)
+     ══════════════════════════════════════════════════════════ */
+
+  /**
+   * پیدا کردن همه‌ی کلاس‌های JS با نام مشخص
+   * @returns [{ start, end, name, keywordStart }]
+   */
+  findAllClasses(src, name){
+    if(!name || !src) return [];
+    const results = [];
+    const re = new RegExp('\\bclass\\s+' + Utils.escRegex(name) + '\\b', 'g');
+    let m;
+    let safety = this.MAX_ITERATIONS;
+
+    while((m = re.exec(src)) && safety-- > 0){
+      const open = src.indexOf('{', m.index);
+      if(open === -1) continue;
+
+      const close = this.skipBrace(src, open, 'js');
+      if(close === -1) continue;
+
+      // ✅ شروع از ابتدای خط
+      const lineStart = src.lastIndexOf('\n', m.index) + 1;
+      let start = lineStart;
+      // اگر قبل از class کامنت بود، آن را هم بگیر
+      start = this.findBlockStart(src, m.index);
+
+      results.push({
+        start,
+        end: close + 1,
+        name,
+        keywordStart: m.index
+      });
+
+      re.lastIndex = close + 1;
+    }
+    return results;
+  }
+
+  /**
+   * پیدا کردن همه‌ی متدهای JS با نام مشخص
+   * ✅ فقط تعریف‌ها (با {) نه فراخوانی‌ها
+   */
+  findAllFunctions(src, name){
+    if(!name || !src) return [];
+    const results = [];
+    const re = new RegExp('(?:\\bfunction\\s+)?\\b' + Utils.escRegex(name) + '\\b\\s*(?=\\()', 'g');
+    let m;
+    let safety = this.MAX_ITERATIONS;
+
+    while((m = re.exec(src)) && safety-- > 0){
+      const end = this.findFunctionBody(src, m.index, m[0].length);
+
+      if(end === -1){
+        re.lastIndex = m.index + 1;
+        continue;
+      }
+
+      // ✅ شروع از ابتدای خط
+      const start = this.findBlockStart(src, m.index);
+
+      results.push({
+        start,
+        end: end + 1,
+        name,
+        keywordStart: m.index
+      });
+
+      re.lastIndex = end + 1;
+    }
+    return results;
+  }
+
+  /**
+   * پیدا کردن همه‌ی المان‌های HTML با انتخابگر مشخص
+   * ✅ نادیده‌گرفتن <script> و <style> و کامنت‌ها
+   */
+  findAllElements(src, selector){
+    if(!selector || !src) return [];
+    const parsed = this._parseElementSelector(selector);
+    if(!parsed) return [];
+
+    const results = [];
+    const re = /<([a-zA-Z][\w-]*)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g;
+    let m;
+    let safety = this.MAX_ITERATIONS;
+
+    while((m = re.exec(src)) && safety-- > 0){
+      const tag = m[1];
+      const attrs = m[2] || '';
+      const openStart = m.index;
+      const openEnd = re.lastIndex;
+
+      // رد کردن script/style با محتوای داخلی
+      const lowerTag = tag.toLowerCase();
+      if(lowerTag === 'script' || lowerTag === 'style'){
+        const closeTag = '</' + lowerTag + '>';
+        const closeIdx = src.indexOf(closeTag, openEnd);
+        if(closeIdx !== -1){
+          re.lastIndex = closeIdx + closeTag.length;
+          continue;
+        }
+      }
+
+      // چک انتخابگر
+      if(!this._matchesElementSelector(tag, attrs, parsed)){
+        continue;
+      }
+
+      // محاسبه‌ی end
+      let end;
+      const selfClose = /\/>$/.test(m[0]);
+      if(selfClose || this._isVoidTag(lowerTag)){
+        end = openEnd;
+      } else {
+        end = this.findMatchingClose(src, openEnd, lowerTag);
+        if(end === -1){
+          re.lastIndex = openEnd;
+          continue;
+        }
+      }
+
+      results.push({
+        start: openStart,
+        end,
+        name: selector,
+        tag: lowerTag
+      });
+
+      re.lastIndex = end;
+    }
+    return results;
+  }
+
+  /**
+   * پیدا کردن همه‌ی بلوک‌های CSS با انتخابگر مشخص
+   * ✅ نادیده‌گرفتن کامنت‌ها
+   */
+  findAllCSSBlocks(src, selector){
+    if(!selector || !src) return [];
+    const results = [];
+    let from = 0;
+    let safety = this.MAX_ITERATIONS;
+
+    while(from < src.length && safety-- > 0){
+      const i = src.indexOf(selector, from);
+      if(i === -1) break;
+
+      // ✅ چک کن داخل کامنت نباشد
+      if(this._isInsideCSSComment(src, i)){
+        from = i + 1;
+        continue;
+      }
+
+      let j = i + selector.length;
+      while(j < src.length && /\s/.test(src[j])) j++;
+
+      if(src[j] === '{'){
+        const close = this.skipBrace(src, j, 'css');
+        if(close === -1) break;
+
+        results.push({
+          start: i,
+          end: close + 1,
+          name: selector
+        });
+
+        from = close + 1;
+      } else {
+        from = i + selector.length;
+      }
+    }
+    return results;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     Wrappers — find* فقط از findAll* استفاده می‌کند
+     ══════════════════════════════════════════════════════════ */
 
   findClass(src, name){
-    if(!name) return null;
-    const re = new RegExp('\\bclass\\s+' + Utils.escRegex(name) + '\\b');
-    const m = re.exec(src);
-    if(!m) return null;
-    const open = src.indexOf('{', m.index);
-    if(open === -1) return null;
-    const close = this.scanBrace(src, open, 'js');
-    if(close === -1) return null;
-    return [m.index, close + 1];
+    const all = this.findAllClasses(src, name);
+    return all.length ? [all[0].start, all[0].end] : null;
   }
 
   findFunction(src, name){
-    if(!name) return null;
-    const re = new RegExp('(?:\\bfunction\\s+)?\\b' + Utils.escRegex(name) + '\\b\\s*(?=\\()');
-    const m = re.exec(src);
-    if(!m) return null;
-    let i = m.index + m[0].length;
-    const pOpen = src.indexOf('(', i);
-    if(pOpen === -1) return null;
-    let depth = 0, j = pOpen;
-    while(j < src.length){
-      const c = src[j];
-      if(c === '/' && src[j+1] === '*'){ const e = src.indexOf('*/', j+2); if(e===-1) break; j = e+2; continue; }
-      if(c === '/' && src[j+1] === '/'){ const e = src.indexOf('\n', j+2); if(e===-1) break; j = e+1; continue; }
-      if(c === "'" || c === '"'){ j = this.skipString(src, j, c); continue; }
-      if(c === '`'){ j = this.skipTemplate(src, j); continue; }
-      if(c === '(') depth++;
-      else if(c === ')'){ depth--; if(depth === 0){ j++; break; } }
-      j++;
-    }
-    while(j < src.length && /\s/.test(src[j])) j++;
-    if(src[j] !== '{') return null;
-    const close = this.scanBrace(src, j, 'js');
-    if(close === -1) return null;
-
-    // ✅ NEW: start از خود م.index شروع شود (شامل کلمه‌ی function اگر باشد)
-    // اگر regex شامل "function" بود، همان شروع را بگیر
-    // اگر نه، فقط از m.index که شروع نام متد است
-    const start = m.index;
-
-    return [start, close + 1];
-  }
-
-  /* ============================================================
-     بخش ۳ — پیدا کردن ساختارهای HTML/CSS
-     ============================================================ */
-
-  findCSSBlock(src, selector){
-    if(!selector) return null;
-    let from = 0;
-    while(true){
-      const i = src.indexOf(selector, from);
-      if(i === -1) return null;
-      let j = i + selector.length;
-      while(j < src.length && /\s/.test(src[j])) j++;
-      if(src[j] === '{'){
-        const close = this.scanBrace(src, j, 'css');
-        if(close === -1) return null;
-        return [i, close + 1];
-      }
-      from = i + selector.length;
-    }
-  }
-
-  findMatchingClose(src, from, tagName){
-    const tl = tagName.toLowerCase();
-    const VOID = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
-    const RAW  = new Set(['script','style','textarea','title']);
-    let depth = 1, i = from;
-    const n = src.length;
-    while(i < n){
-      const lt = src.indexOf('<', i);
-      if(lt === -1) return -1;
-      if(src.startsWith('<!--', lt)){ const e = src.indexOf('-->', lt+4); if(e===-1) return -1; i = e+3; continue; }
-      if(src.startsWith('<![CDATA[', lt)){ const e = src.indexOf(']]>', lt+9); i = e===-1?n:e+3; continue; }
-      if(src.startsWith('<!', lt) || src.startsWith('<?', lt)){ const e = src.indexOf('>', lt); i = e===-1?n:e+1; continue; }
-      const m = /^<\s*(\/?)\s*([a-zA-Z][\w-]*)/.exec(src.slice(lt, lt+60));
-      if(!m){ i = lt+1; continue; }
-      const closing = m[1] === '/';
-      const t = m[2].toLowerCase();
-      const gt = src.indexOf('>', lt);
-      if(gt === -1) return -1;
-      if(t === tl){
-        const selfClose = src[gt-1] === '/';
-        if(closing){
-          depth--;
-          if(depth === 0) return gt + 1;
-        } else if(!selfClose && !VOID.has(t)){
-          depth++;
-        }
-      }
-      if(!closing && RAW.has(t)){
-        const re = new RegExp('</' + t + '\\s*>', 'i');
-        const rest = src.slice(gt+1);
-        const cm = re.exec(rest);
-        i = cm ? gt + 1 + cm.index + cm[0].length : gt + 1;
-        continue;
-      }
-      i = gt + 1;
-    }
-    return -1;
+    const all = this.findAllFunctions(src, name);
+    return all.length ? [all[0].start, all[0].end] : null;
   }
 
   findElement(src, selector){
-    const sel = String(selector || '').trim();
-    const m = /^([a-zA-Z][\w-]*)?(#[\w:-]+)?((?:\.[\w-]+)*)$/.exec(sel);
-    if(!m) return null;
-    const tag = m[1] || null;
-    const id = m[2] ? m[2].slice(1) : null;
-    const classes = m[3] ? m[3].split('.').filter(Boolean) : [];
-
-    const tagRe = /<([a-zA-Z][\w-]*)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g;
-    let mm;
-    while((mm = tagRe.exec(src))){
-      const t = mm[1];
-      if(tag && t.toLowerCase() !== tag.toLowerCase()) continue;
-      const attrs = mm[2] || '';
-      if(id){
-        const idm = /id\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(attrs);
-        const val = idm ? (idm[1] !== undefined ? idm[1] : (idm[2] !== undefined ? idm[2] : idm[3])) : null;
-        if(val !== id) continue;
-      }
-      if(classes.length){
-        const cm = /class\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(attrs);
-        const raw = cm ? (cm[1] !== undefined ? cm[1] : (cm[2] !== undefined ? cm[2] : cm[3])) : '';
-        const cls = raw.split(/\s+/);
-        if(!classes.every(c => cls.indexOf(c) !== -1)) continue;
-      }
-      const openStart = mm.index;
-      const openEnd = tagRe.lastIndex;
-      if(/\/>$/.test(mm[0]) || ['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'].includes(t.toLowerCase()))
-        return [openStart, openEnd];
-      const end = this.findMatchingClose(src, openEnd, t);
-      if(end === -1) return null;
-      return [openStart, end];
-    }
-    return null;
+    const all = this.findAllElements(src, selector);
+    return all.length ? [all[0].start, all[0].end] : null;
   }
 
-  /* ============================================================
-     بخش ۴ — جستجوی زمینه‌دار (Context-Aware)
-     ============================================================ */
+  findCSSBlock(src, selector){
+    const all = this.findAllCSSBlocks(src, selector);
+    return all.length ? [all[0].start, all[0].end] : null;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     لایه ۳ — Context (جستجوی زمینه‌دار)
+     ══════════════════════════════════════════════════════════ */
 
   /**
-   * پیدا کردن متد داخل کلاس
-   * @returns { start, end, classStart, classEnd } | null
+   * پیدا کردن متد داخل کلاس مشخص
    */
   findFunctionInClass(src, fnName, className){
     if(!fnName || !className) return null;
+
     const classRange = this.findClass(src, className);
     if(!classRange) return null;
 
-    const [cStart, cEnd] = classRange;
-    const classText = src.slice(cStart, cEnd);
+    // جستجو داخل بدنه‌ی کلاس (بین { و })
+    const inner = this._getInnerBody(src, classRange[0], classRange[1]);
+    if(!inner) return null;
 
-    const fnRange = this.findFunction(classText, fnName);
+    const fnRange = this.findFunction(inner.text, fnName);
     if(!fnRange) return null;
 
     return {
-      start: cStart + fnRange[0],
-      end: cStart + fnRange[1],
-      classStart: cStart,
-      classEnd: cEnd
+      start: inner.offset + fnRange[0],
+      end: inner.offset + fnRange[1],
+      classStart: classRange[0],
+      classEnd: classRange[1]
     };
   }
 
@@ -3070,36 +3129,36 @@ class Scanners {
    */
   findFunctionInFunction(src, innerName, outerName){
     if(!innerName || !outerName) return null;
+
     const outerRange = this.findFunction(src, outerName);
     if(!outerRange) return null;
 
-    const [oStart, oEnd] = outerRange;
-    const outerText = src.slice(oStart, oEnd);
+    const inner = this._getInnerBody(src, outerRange[0], outerRange[1]);
+    if(!inner) return null;
 
-    const innerRange = this.findFunction(outerText, innerName);
-    if(!innerRange) return null;
+    const fnRange = this.findFunction(inner.text, innerName);
+    if(!fnRange) return null;
 
     return {
-      start: oStart + innerRange[0],
-      end: oStart + innerRange[1],
-      outerStart: oStart,
-      outerEnd: oEnd
+      start: inner.offset + fnRange[0],
+      end: inner.offset + fnRange[1],
+      outerStart: outerRange[0],
+      outerEnd: outerRange[1]
     };
   }
 
   /**
-   * پیدا کردن با مسیر چندسطحی
-   * path = [{ type:'class', name:'App' }, { type:'function', name:'outer' }]
+   * پیدا کردن متد با مسیر چندسطحی
+   * مسیر: [{type:'class', name:'App'}, {type:'function', name:'init'}]
    */
   findFunctionByPath(src, path){
     if(!path || !path.length) return null;
 
     let currentText = src;
     let offset = 0;
-    let lastValidStart = 0, lastValidEnd = src.length;
+    let lastRange = null;
 
-    for(let i = 0; i < path.length; i++){
-      const step = path[i];
+    for(const step of path){
       let range = null;
 
       if(step.type === 'class'){
@@ -3110,19 +3169,24 @@ class Scanners {
 
       if(!range) return null;
 
-      lastValidStart = offset + range[0];
-      lastValidEnd = offset + range[1];
+      lastRange = {
+        start: offset + range[0],
+        end: offset + range[1]
+      };
 
-      currentText = currentText.slice(range[0], range[1]);
-      offset += range[0];
+      // محدود کردن به بدنه برای مرحله‌ی بعد
+      const inner = this._getInnerBody(currentText, range[0], range[1]);
+      if(!inner) return lastRange;
+
+      currentText = inner.text;
+      offset += inner.offset;
     }
 
-    return { start: lastValidStart, end: lastValidEnd };
+    return lastRange;
   }
 
   /**
    * پیدا کردن بلوک CSS با زمینه
-   * استراتژی: اول "context selector" را امتحان کن، سپس fallback
    */
   findCSSBlockInContext(src, selector, context){
     if(!selector) return null;
@@ -3133,189 +3197,380 @@ class Scanners {
       return r ? { start: r[0], end: r[1] } : null;
     }
 
-    // حالت ۲: با زمینه — ابتدا context + selector را امتحان کن
-    const combinedSelector = context + ' ' + selector;
-    let r = this.findCSSBlock(src, combinedSelector);
-    if(r){
-      return { start: r[0], end: r[1] };
+    // حالت ۲: context + selector ترکیبی
+    const combined = context + ' ' + selector;
+    let r = this.findAllCSSBlocks(src, combined);
+    if(r.length){
+      return { start: r[0].start, end: r[0].end };
     }
 
-    // حالت ۳: اگر selector از context شروع می‌شود
+    // حالت ۳: selector شامل context
     if(selector.startsWith(context)){
-      r = this.findCSSBlock(src, selector);
-      if(r){
-        return { start: r[0], end: r[1] };
+      r = this.findAllCSSBlocks(src, selector);
+      if(r.length){
+        return { start: r[0].start, end: r[0].end };
       }
     }
 
-    // حالت ۴: fallback — داخل بلوک context دنبال selector بگرد
+    // حالت ۴: جستجوی selector داخل بلوک context
     const ctxRange = this.findCSSBlock(src, context);
     if(!ctxRange) return null;
 
-    const searchText = src.slice(ctxRange[0], ctxRange[1]);
-    const innerRange = this.findCSSBlock(searchText, selector);
-    if(innerRange){
-      return {
-        start: ctxRange[0] + innerRange[0],
-        end: ctxRange[0] + innerRange[1]
-      };
-    }
-
-    return null;
-  }
-
-  /**
-   * پیدا کردن المان HTML با زمینه
-   */
-  findElementInContext(src, selector, context){
-    if(!selector) return null;
-
-    let searchText = src;
-    let offset = 0;
-
-    if(context){
-      const ctxRange = this.findElement(src, context);
-      if(!ctxRange) return null;
-      searchText = src.slice(ctxRange[0], ctxRange[1]);
-      offset = ctxRange[0];
-    }
-
-    const elRange = this.findElement(searchText, selector);
-    if(!elRange) return null;
-
-    // اگر context داشتیم و اولین تطابق، خود المان والد بود → skip
-    if(context && elRange[0] === 0 && offset > 0){
-      // از این حالت صرف نظر کن یا داخلش دنبال بعدی بگرد
-      return null;
-    }
+    const innerText = src.slice(ctxRange[0], ctxRange[1]);
+    const innerRange = this.findCSSBlock(innerText, selector);
+    if(!innerRange) return null;
 
     return {
-      start: offset + elRange[0],
-      end: offset + elRange[1]
+      start: ctxRange[0] + innerRange[0],
+      end: ctxRange[0] + innerRange[1]
     };
   }
 
   /**
-   * پارس مسیر چندسطحی
-   * "class:App > function:outer > function:inner"
+   * پیدا کردن المان HTML داخل زمینه
    */
-  parsePath(str){
-    if(!str) return null;
-    const parts = String(str).split(/\s*>\s*/);
-    const out = [];
-    for(const part of parts){
-      const m = /^(class|function|selector|element|css):(.+)$/.exec(part.trim());
-      if(!m) return null;
-      out.push({ type: m[1], name: m[2].trim() });
+  findElementInContext(src, selector, context){
+    if(!selector) return null;
+
+    // بدون زمینه
+    if(!context){
+      const r = this.findElement(src, selector);
+      return r ? { start: r[0], end: r[1] } : null;
     }
-    return out.length ? out : null;
+
+    // با زمینه
+    const ctxRange = this.findElement(src, context);
+    if(!ctxRange) return null;
+
+    // بدنه‌ی داخلی والد (بدون خود تگ)
+    const inner = this._getInnerBody(src, ctxRange[0], ctxRange[1], 'html');
+    if(!inner) return null;
+
+    const innerResults = this.findAllElements(inner.text, selector);
+    if(!innerResults.length) return null;
+
+    return {
+      start: inner.offset + innerResults[0].start,
+      end: inner.offset + innerResults[0].end
+    };
   }
 
-  /* ============================================================
-     بخش ۵ — findAll* (برای تصمیم‌گیری چند موردی)
-     ============================================================ */
+  /* ══════════════════════════════════════════════════════════
+     لایه ۴ — Utils
+     ══════════════════════════════════════════════════════════ */
 
-  findAllClasses(src, name){
-    if(!name) return [];
-    const results = [];
-    const re = new RegExp('\\bclass\\s+' + Utils.escRegex(name) + '\\b', 'g');
-    let m;
-    while((m = re.exec(src))){
-      const open = src.indexOf('{', m.index);
-      if(open === -1){ re.lastIndex = m.index + 1; continue; }
-      const close = this.scanBrace(src, open, 'js');
-      if(close === -1){ re.lastIndex = m.index + 1; continue; }
-      results.push({ start: m.index, end: close + 1, name });
-      re.lastIndex = close + 1;
+  /**
+   * پیدا کردن matching close tag برای HTML
+   */
+  findMatchingClose(src, from, tagName){
+    const lower = tagName.toLowerCase();
+    const RAW = { script: true, style: true, textarea: true, title: true };
+    let depth = 1;
+    let i = from;
+    let safety = this.MAX_ITERATIONS;
+
+    while(i < src.length && safety-- > 0){
+      const lt = src.indexOf('<', i);
+      if(lt === -1) return -1;
+
+      // کامنت
+      if(src.startsWith('<!--', lt)){
+        const e = src.indexOf('-->', lt + 4);
+        if(e === -1) return -1;
+        i = e + 3;
+        continue;
+      }
+
+      // CDATA
+      if(src.startsWith('<![CDATA[', lt)){
+        const e = src.indexOf(']]>', lt + 9);
+        i = e === -1 ? src.length : e + 3;
+        continue;
+      }
+
+      // doctype یا declaration
+      if(src.startsWith('<!', lt) || src.startsWith('<?', lt)){
+        const e = src.indexOf('>', lt);
+        i = e === -1 ? src.length : e + 1;
+        continue;
+      }
+
+      // تگ
+      const m = /^<\s*(\/?)\s*([a-zA-Z][\w-]*)/.exec(src.slice(lt, lt + 60));
+      if(!m){ i = lt + 1; continue; }
+
+      const closing = m[1] === '/';
+      const tag = m[2].toLowerCase();
+      const gt = src.indexOf('>', lt);
+      if(gt === -1) return -1;
+
+      if(tag === lower){
+        const selfClose = src[gt-1] === '/';
+        if(closing){
+          depth--;
+          if(depth === 0) return gt + 1;
+        } else if(!selfClose && !this._isVoidTag(tag)){
+          depth++;
+        }
+      }
+
+      // رد کردن محتوای script/style
+      if(!closing && RAW[tag]){
+        const closeRe = new RegExp('</' + tag + '\\s*>', 'i');
+        const rest = src.slice(gt + 1);
+        const cm = closeRe.exec(rest);
+        i = cm ? gt + 1 + cm.index + cm[0].length : gt + 1;
+        continue;
+      }
+
+      i = gt + 1;
     }
-    return results;
+    return -1;
   }
 
-  findAllFunctions(src, name){
-    if(!name) return [];
-    const results = [];
-    const re = new RegExp('(?:\\bfunction\\s+)?\\b' + Utils.escRegex(name) + '\\b\\s*(?=\\()', 'g');
-    let m;
-    while((m = re.exec(src))){
-      let i = m.index + m[0].length;
-      const pOpen = src.indexOf('(', i);
-      if(pOpen === -1){ re.lastIndex = m.index + 1; continue; }
-      let depth = 0, j = pOpen;
-      while(j < src.length){
-        const c = src[j];
-        if(c === '/' && src[j+1] === '*'){ const e = src.indexOf('*/', j+2); if(e===-1) break; j = e+2; continue; }
-        if(c === '/' && src[j+1] === '/'){ const e = src.indexOf('\n', j+2); if(e===-1) break; j = e+1; continue; }
-        if(c === "'" || c === '"'){ j = this.skipString(src, j, c); continue; }
-        if(c === '`'){ j = this.skipTemplate(src, j); continue; }
-        if(c === '(') depth++;
-        else if(c === ')'){ depth--; if(depth === 0){ j++; break; } }
-        j++;
-      }
-      while(j < src.length && /\s/.test(src[j])) j++;
-      if(src[j] !== '{'){ re.lastIndex = m.index + 1; continue; }
-      const close = this.scanBrace(src, j, 'js');
-      if(close === -1){ re.lastIndex = m.index + 1; continue; }
-      results.push({ start: m.index, end: close + 1, name });
-      re.lastIndex = close + 1;
+  /**
+   * پیدا کردن شروع بلوک (شامل کامنت‌های قبل از آن)
+   */
+  findBlockStart(src, pos){
+    if(pos <= 0) return 0;
+    if(pos > src.length) pos = src.length;
+
+    // ✅ ابتدای خط فعلی که pos در آن است
+    let currentLineStart = src.lastIndexOf('\n', pos - 1) + 1;
+
+    // ✅ به خط قبل برو (خط فعلی را نادیده بگیر)
+    if(currentLineStart === 0){
+      // pos در خط اول است، هیچ کامنتی بالای آن نیست
+      return 0;
     }
-    return results;
+
+    // ابتدای خط قبل
+    currentLineStart = src.lastIndexOf('\n', currentLineStart - 2) + 1;
+
+    let safety = 200;
+
+    // ✅ حالا از خط قبل شروع کن و تا خطوط کامنت/خالی عقب برو
+    while(safety-- > 0){
+      // محتوای خط فعلی
+      let lineEnd = src.indexOf('\n', currentLineStart);
+      if(lineEnd === -1) lineEnd = src.length;
+      const line = src.slice(currentLineStart, lineEnd).trim();
+
+      const isComment = this._isCommentLine(line);
+      const isBlank = line === '';
+
+      if(isComment || isBlank){
+        // خط کامنت یا خالی است → به خط قبل برو
+        if(currentLineStart === 0){
+          // ابتدای فایل — همه چیز کامنت بوده
+          return 0;
+        }
+        currentLineStart = src.lastIndexOf('\n', currentLineStart - 2) + 1;
+        continue;
+      }
+
+      // خط کد است → ابتدای خط بعد از این را برگردان
+      // (یعنی خط فعلی کامنت نیست، پس کامنت‌ها از خط بعد شروع می‌شوند)
+      const nextLineStart = src.indexOf('\n', currentLineStart);
+      if(nextLineStart === -1){
+        // این آخرین خط است
+        return currentLineStart;
+      }
+      return nextLineStart + 1;
+    }
+
+    return 0;
   }
 
-  findAllElements(src, selector){
-    if(!selector) return [];
-    const sel = String(selector).trim();
-    const m = /^([a-zA-Z][\w-]*)?(#[\w:-]+)?((?:\.[\w-]+)*)$/.exec(sel);
-    if(!m) return [];
-    const tag = m[1] || null;
-    const id = m[2] ? m[2].slice(1) : null;
-    const classes = m[3] ? m[3].split('.').filter(Boolean) : [];
+  /**
+   * چک کن آیا این خط، بخشی از کامنت است
+   */
+  _isCommentLine(line){
+    if(!line) return false;
 
-    const results = [];
-    const tagRe = /<([a-zA-Z][\w-]*)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g;
-    let mm;
-    while((mm = tagRe.exec(src))){
-      const t = mm[1];
-      if(tag && t.toLowerCase() !== tag.toLowerCase()) continue;
-      const attrs = mm[2] || '';
-      if(id){
-        const idm = /id\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(attrs);
-        const val = idm ? (idm[1] !== undefined ? idm[1] : (idm[2] !== undefined ? idm[2] : idm[3])) : null;
-        if(val !== id) continue;
-      }
-      if(classes.length){
-        const cm = /class\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(attrs);
-        const raw = cm ? (cm[1] !== undefined ? cm[1] : (cm[2] !== undefined ? cm[2] : cm[3])) : '';
-        const cls = raw.split(/\s+/);
-        if(!classes.every(c => cls.indexOf(c) !== -1)) continue;
-      }
-      const openStart = mm.index;
-      const openEnd = tagRe.lastIndex;
-      let end;
-      if(/\/>$/.test(mm[0]) || ['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'].includes(t.toLowerCase())){
-        end = openEnd;
-      } else {
-        end = this.findMatchingClose(src, openEnd, t);
-        if(end === -1){ tagRe.lastIndex = openEnd; continue; }
-      }
-      results.push({ start: openStart, end, name: selector });
-      tagRe.lastIndex = end;
-    }
-    return results;
+    // کامنت خطی
+    if(/^\/\//.test(line)) return true;
+
+    // کامنت بلوکی یک‌خطی
+    if(/^\/\*[\s\S]*?\*\/$/.test(line)) return true;
+
+    // شروع کامنت بلوکی چندخطی
+    if(/^\/\*/.test(line)) return true;
+
+    // انتهای کامنت بلوکی چندخطی
+    if(/\*\/$/.test(line)) return true;
+
+    // خطوط میانی کامنت بلوکی (* Comment)
+    if(/^\*/.test(line)) return true;
+
+    return false;
   }
 
+  /**
+   * پیدا کردن آخرین موقعیت مطابقت‌ها
+   */
   findOccurrences(text, needle, caseSensitive){
     const out = [];
     if(!needle) return out;
+
     const h = caseSensitive ? text : text.toLowerCase();
     const n = caseSensitive ? needle : needle.toLowerCase();
+
     let i = 0;
-    while(true){
+    let safety = this.MAX_ITERATIONS;
+
+    while(i < text.length && safety-- > 0){
       const k = h.indexOf(n, i);
       if(k === -1) break;
       out.push(k);
       i = k + n.length;
     }
     return out;
+  }
+
+  /**
+   * پارس مسیر چندسطحی: "class:App > function:init"
+   */
+  parsePath(str){
+    if(!str) return null;
+    const parts = String(str).split(/\s*>\s*/);
+    const out = [];
+
+    for(const part of parts){
+      const m = /^(class|function|selector|element|css):(.+)$/.exec(part.trim());
+      if(!m) return null;
+      out.push({ type: m[1], name: m[2].trim() });
+    }
+
+    return out.length ? out : null;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     متدهای داخلی — با _ شروع می‌شوند
+     ══════════════════════════════════════════════════════════ */
+
+  /**
+   * پیدا کردن بدنه‌ی داخلی بین { } یا بین تگ‌ها
+   * @returns { text, offset, start, end } یا null
+   */
+  _getInnerBody(src, start, end, mode){
+    if(mode === 'html'){
+      // برای HTML: بعد از > اول تا < آخر
+      const openEnd = src.indexOf('>', start);
+      if(openEnd === -1 || openEnd >= end) return null;
+      const closeStart = src.lastIndexOf('<', end - 1);
+      if(closeStart === -1 || closeStart <= openEnd) return null;
+      return {
+        text: src.slice(openEnd + 1, closeStart),
+        offset: openEnd + 1,
+        start: openEnd + 1,
+        end: closeStart
+      };
+    }
+
+    // برای JS/CSS: بین { و }
+    const braceOpen = src.indexOf('{', start);
+    if(braceOpen === -1 || braceOpen >= end) return null;
+    const innerStart = braceOpen + 1;
+    const innerEnd = end - 1;
+    if(innerEnd <= innerStart) return null;
+
+    return {
+      text: src.slice(innerStart, innerEnd),
+      offset: innerStart,
+      start: innerStart,
+      end: innerEnd
+    };
+  }
+
+  /**
+   * پیدا کردن انتهای بدنه‌ی متد (بعد از نام و پارانتز)
+   */
+  findFunctionBody(src, nameStart, nameLength){
+    let i = nameStart + nameLength;
+    const pOpen = src.indexOf('(', i);
+    if(pOpen === -1) return -1;
+
+    // مطابقت پارانتزها
+    let depth = 0;
+    let j = pOpen;
+    let safety = this.MAX_ITERATIONS;
+
+    while(j < src.length && safety-- > 0){
+      const c = src[j];
+      if(c === '/' && src[j+1] === '*'){ const e = src.indexOf('*/', j+2); if(e===-1) break; j = e+2; continue; }
+      if(c === '/' && src[j+1] === '/'){ const e = src.indexOf('\n', j+2); if(e===-1) break; j = e+1; continue; }
+      if(c === "'" || c === '"'){ j = this.skipString(src, j, c); continue; }
+      if(c === '`'){ j = this.skipTemplate(src, j); continue; }
+      if(c === '(') depth++;
+      else if(c === ')'){ depth--; if(depth === 0){ j++; break; } }
+      j++;
+    }
+
+    // skip whitespace
+    while(j < src.length && /\s/.test(src[j])) j++;
+
+    // باید { باشد
+    if(src[j] !== '{') return -1;
+
+    return this.skipBrace(src, j, 'js');
+  }
+
+  /**
+   * پارس انتخابگر المان
+   * "#app", ".container", "div#app", "div.container", etc.
+   */
+  _parseElementSelector(sel){
+    const m = /^([a-zA-Z][\w-]*)?(#[\w:-]+)?((?:\.[\w-]+)*)$/.exec(String(sel).trim());
+    if(!m) return null;
+    return {
+      tag: m[1] || null,
+      id: m[2] ? m[2].slice(1) : null,
+      classes: m[3] ? m[3].split('.').filter(Boolean) : []
+    };
+  }
+
+  /**
+   * چک مطابقت المان با انتخابگر
+   */
+  _matchesElementSelector(tag, attrs, parsed){
+    if(parsed.tag && tag.toLowerCase() !== parsed.tag.toLowerCase()) return false;
+
+    if(parsed.id){
+      const m = /id\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(attrs);
+      const val = m ? (m[1] !== undefined ? m[1] : (m[2] !== undefined ? m[2] : m[3])) : null;
+      if(val !== parsed.id) return false;
+    }
+
+    if(parsed.classes.length){
+      const m = /class\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(attrs);
+      const raw = m ? (m[1] !== undefined ? m[1] : (m[2] !== undefined ? m[2] : m[3])) : '';
+      const cls = raw.split(/\s+/);
+      if(!parsed.classes.every(c => cls.indexOf(c) !== -1)) return false;
+    }
+
+    return true;
+  }
+
+  _isVoidTag(tag){
+    return ['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'].indexOf(tag) !== -1;
+  }
+
+  /**
+   * چک کن آیا موقعیت داخل کامنت CSS است
+   */
+  _isInsideCSSComment(src, pos){
+    let i = 0;
+    while(i < pos){
+      const open = src.indexOf('/*', i);
+      if(open === -1 || open >= pos) return false;
+
+      const close = src.indexOf('*/', open + 2);
+      if(close === -1) return true;  // کامنت باز تا آخر
+      if(close < pos) i = close + 2;
+      else return true;  // داخل کامنت هستیم
+    }
+    return false;
   }
 }
 /* ============================================================
@@ -3539,6 +3794,8 @@ class CommandsHighlighter {
    ============================================================ */
 /* ============================================================
    CLASS 7 · FindBar — نوار Find/Replace پیشرفته
+/* ============================================================
+   CLASS · FindBar — نسخه‌ی جدید (داینامیک)
    ============================================================ */
 class FindBar {
   constructor(app){
@@ -3565,6 +3822,7 @@ class FindBar {
     this.suggestions  = Utils.$('#frSuggestions');
     this.suggestClasses = Utils.$('#frSuggestClasses');
     this.executeBtn   = Utils.$('#frExecute');
+    this.analyzeBtn   = Utils.$('#btnAnalyzeFind');
 
     this.matches = [];
     this.currentIdx = -1;
@@ -3577,6 +3835,7 @@ class FindBar {
   _bind(){
     const self = this;
 
+    // focus بزرگ شد
     [this.findInput, this.replInput, this.insertInput].forEach(el => {
       if(!el) return;
       el.addEventListener('focus', () => {
@@ -3588,37 +3847,69 @@ class FindBar {
       });
     });
 
+    // Action change
     this.actionSelect.addEventListener('change', () => self._updateUIRows());
+
+    // Target change
     this.targetSelect.addEventListener('change', () => self._updateUIRows());
 
+    // Autocomplete
     this._bindAutocomplete(this.targetName, this.suggestions, 'target');
     this._bindAutocomplete(this.inClassInput, this.suggestClasses, 'class');
 
+    // Matches refresh
     const onAny = Utils.debounce(() => self._refreshMatches(), 180);
     this.findInput.addEventListener('input', onAny);
     this.replInput.addEventListener('input', () => self._save());
     [this.flagRegex, this.flagCase, this.flagIndnt, this.flagMulti]
       .forEach(el => el.addEventListener('change', () => { onAny(); self._save(); }));
 
+    // دکمه‌ها
     Utils.$('#btnFindNext').addEventListener('click', () => self.next());
     Utils.$('#btnFindPrev').addEventListener('click', () => self.prev());
-    Utils.$('#btnReplaceOne').addEventListener('click', () => self.replaceOne());
     Utils.$('#btnReplaceAll').addEventListener('click', () => self.replaceAll());
     Utils.$('#btnCount').addEventListener('click', () => self.countMatches());
     Utils.$('#btnPreview').addEventListener('click', () => self.togglePreview());
     Utils.$('#btnFrClear').addEventListener('click', () => self.clear());
+
     this.executeBtn.addEventListener('click', () => self._execute());
+    if(this.analyzeBtn) this.analyzeBtn.addEventListener('click', () => self._analyze());
   }
 
+  /**
+   * ✅ به‌روزرسانی UI بر اساس اکشن و هدف (اکشن اول)
+   * اکشن تعیین می‌کند هدف چه باشد
+   */
   _updateUIRows(){
     const action = this.actionSelect.value;
+
+    // ✅ اکشن تعیین می‌کند هدف چه باشد
+    // اگر اکشن "قفل‌شده" به یک هدف است، آن را اعمال کن
+    if(this._isLockedAction(action)){
+      const lockedTarget = this._getLockedTarget(action);
+      if(this.targetSelect.value !== lockedTarget){
+        this.targetSelect.value = lockedTarget;
+      }
+      // غیرفعال کردن dropdown هدف
+      this.targetSelect.disabled = true;
+      this.targetSelect.classList.add('fr-locked');
+    } else {
+      // هدف فعال
+      this.targetSelect.disabled = false;
+      this.targetSelect.classList.remove('fr-locked');
+    }
+
+    // حالا هدف فعلی را بخوان
     const target = this.targetSelect.value;
     const isTextTarget = (target === 'text');
 
+    // ردیف هدف/زمینه
     this.targetRow.style.display = isTextTarget ? 'none' : 'grid';
+
+    // ردیف Find/Replace
     this.textRow.style.display = isTextTarget ? 'grid' : 'none';
 
-    // ✅ اکشن‌هایی که به متن ورودی نیاز دارند
+    // ردیف Insert/Replace
     const needsContent = (
       action === 'insertBefore' ||
       action === 'insertAfter' ||
@@ -3628,7 +3919,7 @@ class FindBar {
     );
     this.insertRow.style.display = (!isTextTarget && needsContent) ? 'grid' : 'none';
 
-    // برچسب داینامیک
+    // برچسب Insert
     const label = Utils.$('#frInsertLabel');
     if(label){
       const labelMap = {
@@ -3639,6 +3930,79 @@ class FindBar {
         replaceElement: 'المان جدید'
       };
       label.textContent = labelMap[action] || 'متن';
+    }
+
+    // فعال/غیرفعال کردن دکمه‌های ناوبری
+    const navBtns = ['#btnFindPrev', '#btnFindNext', '#btnCount', '#btnPreview'];
+    navBtns.forEach(sel => {
+      const el = Utils.$(sel);
+      if(el) el.disabled = !isTextTarget;
+    });
+  }
+
+  /**
+   * چک کن آیا اکشن به یک هدف خاص قفل است
+   */
+  _isLockedAction(action){
+    return ['replaceAll', 'replace', 'replaceRegex',
+            'replaceClass', 'replaceFunction', 'replaceElement'].includes(action);
+  }
+
+  /**
+   * هدف قفل‌شده برای اکشن
+   */
+  _getLockedTarget(action){
+    if(action === 'replaceAll' || action === 'replace' || action === 'replaceRegex'){
+      return 'text';
+    }
+    if(action === 'replaceClass') return 'class';
+    if(action === 'replaceFunction') return 'function';
+    if(action === 'replaceElement') return 'element';
+    return 'text';
+  }
+  /**
+   * بازسازی Dropdown اکشن بر اساس هدف
+   */
+  _rebuildActionOptions(target){
+    const sel = this.actionSelect;
+    const current = sel.value;
+
+    let options = '';
+
+    if(target === 'text'){
+      options = `
+        <option value="replaceAll">replaceAll — جایگزینی همه</option>
+        <option value="replace">replace — جایگزینی اولین</option>
+        <option value="replaceRegex">replaceRegex — Regex</option>
+      `;
+    } else if(target === 'class'){
+      options = `
+        <option value="replaceClass">replaceClass — جایگزینی کلاس</option>
+        <option value="insertBefore">insertBefore — درج قبل</option>
+        <option value="insertAfter">insertAfter — درج بعد</option>
+        <option value="delete">delete — حذف</option>
+      `;
+    } else if(target === 'function'){
+      options = `
+        <option value="replaceFunction">replaceFunction — جایگزینی متد</option>
+        <option value="insertBefore">insertBefore — درج قبل</option>
+        <option value="insertAfter">insertAfter — درج بعد</option>
+        <option value="delete">delete — حذف</option>
+      `;
+    } else if(target === 'element'){
+      options = `
+        <option value="replaceElement">replaceElement — جایگزینی المان</option>
+        <option value="insertBefore">insertBefore — درج قبل</option>
+        <option value="insertAfter">insertAfter — درج بعد</option>
+        <option value="delete">delete — حذف</option>
+      `;
+    }
+
+    sel.innerHTML = options;
+
+    // تلاش برای حفظ اکشن قبلی
+    if([].some.call(sel.options, o => o.value === current)){
+      sel.value = current;
     }
   }
 
@@ -3733,7 +4097,7 @@ class FindBar {
       }
     }
 
-    if(targetType === 'function' || targetType === 'text'){
+    if(targetType === 'function'){
       const re = /(?:^|\s)(?:async\s+)?(?:function\s+)?([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/g;
       let m;
       const seen = new Set();
@@ -3748,7 +4112,7 @@ class FindBar {
       }
     }
 
-    if(targetType === 'element' || targetType === 'text'){
+    if(targetType === 'element'){
       const ids = new Set();
       const cls = new Set();
       const reId = /\bid\s*=\s*"([^"]+)"/g;
@@ -3778,55 +4142,77 @@ class FindBar {
     });
   }
 
-  _execute(){
+  /**
+   * ساخت cmd از فیلدهای FindBar
+   */
+  _buildCommand(){
     const action = this.actionSelect.value;
     const target = this.targetSelect.value;
+    const cmd = { action: action };
 
     if(target === 'text'){
-      if(action === 'replaceAll') this.replaceAll();
-      else if(action === 'replace') this.replaceOne();
-      else if(action === 'replaceRegex') this.replaceAll();
-      else Toast.warn('اکشن متنی نامعتبر');
+      cmd.find = this.findInput.value;
+      if(action === 'replaceRegex'){
+        cmd.pattern = this.findInput.value;
+        cmd.flags = this._getRegexFlags();
+        delete cmd.find;
+      }
+      cmd.replace = this.replInput.value;
     } else {
-      this._executeTargetAction(action, target);
-    }
-  }
-
-  _executeTargetAction(action, target){
-    const name = this.targetName.value.trim();
-    if(!name){ Toast.warn('نام هدف را وارد کنید'); return; }
-
-    const cmd = { action: action, target: target, targetName: name };
-
-    // ✅ برای insert و replace، به متن ورودی نیاز داریم
-    const needsContent = (
-      action === 'insertBefore' ||
-      action === 'insertAfter' ||
-      action === 'replaceClass' ||
-      action === 'replaceFunction' ||
-      action === 'replaceElement'
-    );
-
-    if(needsContent){
-      const content = this.insertInput.value;
-      if(!content){ Toast.warn('متن را وارد کنید'); return; }
+      cmd.target = target;
+      cmd.targetName = this.targetName.value.trim();
+      if(this.inClassInput.value.trim()){
+        cmd.inClass = this.inClassInput.value.trim();
+      }
       if(action === 'insertBefore' || action === 'insertAfter'){
-        cmd.insert = content;
-      } else {
-        cmd.replace = content;
+        cmd.insert = this.insertInput.value;
+      } else if(action === 'replaceClass' || action === 'replaceFunction' || action === 'replaceElement'){
+        cmd.replace = this.insertInput.value;
       }
     }
 
-    const inCls = this.inClassInput.value.trim();
-    if(inCls) cmd.inClass = inCls;
+    return cmd;
+  }
 
+  _getRegexFlags(){
+    let f = 'g';
+    if(!this.flagCase.checked) f += 'i';
+    if(this.flagMulti.checked) f += 's';
+    return f;
+  }
+
+  _execute(){
+    const target = this.targetSelect.value;
+    const cmd = this._buildCommand();
+
+    // اعتبارسنجی
+    const errors = this.app.parser.validate(cmd);
+    if(errors.length){
+      Toast.err(errors.join(' · '));
+      return;
+    }
+
+    // preflight
     const pre = this.app.runner.preflight(cmd, this.app.state.current, this.app.state.settings);
-    if(pre.kind === 'error'){ Toast.err(pre.message); return; }
-    if(pre.kind === 'mismatch'){ Toast.warn('انتظار: ' + pre.expectDesc + ' — یافت: ' + pre.found); return; }
-    if(pre.kind === 'ask'){ Toast.warn('چند مورد یافت شد. از باکس دستورات استفاده کنید.'); return; }
 
+    if(pre.kind === 'error'){
+      Toast.err(pre.message);
+      return;
+    }
+    if(pre.kind === 'mismatch'){
+      Toast.warn('انتظار: ' + pre.expectDesc + ' — یافت: ' + pre.found);
+      // ادامه می‌دهیم — به عنوان نتیجه ثبت می‌شود
+    }
+    if(pre.kind === 'warn'){
+      Toast.warn(pre.message);
+    }
+    if(pre.kind === 'ask'){
+      Toast.warn(pre.found + ' مورد یافت شد — اولین مورد اعمال می‌شود');
+    }
+
+    // اجرا
     const before = this.app.state.current;
-    const res = this.app.runner.runOne(cmd, this.app.state.current, this.app.state.settings);
+    const res = this.app.runner.runOne(cmd, before, this.app.state.settings);
 
     if(res.ok){
       this.app.state.current = res.text;
@@ -3835,9 +4221,34 @@ class FindBar {
       this.app._refreshStats(res.ms);
       this.app._saveSession();
       Toast.ok(res.message);
+      if(target === 'text') this._refreshMatches();
     } else {
       this.app._pushResult(cmd, res, before);
       Toast.err(res.message);
+    }
+  }
+
+  _analyze(){
+    const cmd = this._buildCommand();
+
+    const errors = this.app.parser.validate(cmd);
+    if(errors.length){
+      Toast.err(errors.join(' · '));
+      return;
+    }
+
+    const pre = this.app.runner.preflight(cmd, this.app.state.current, this.app.state.settings);
+
+    if(pre.kind === 'ok'){
+      Toast.ok('✅ قابل اجرا');
+    } else if(pre.kind === 'warn'){
+      Toast.warn('⚠️ ' + (pre.message || 'هشدار'));
+    } else if(pre.kind === 'mismatch'){
+      Toast.err('❌ انتظار: ' + pre.expectDesc + ' — یافت: ' + pre.found);
+    } else if(pre.kind === 'ask'){
+      Toast.warn('⚠️ ' + pre.found + ' مورد یافت شد');
+    } else if(pre.kind === 'error'){
+      Toast.err('❌ ' + pre.message);
     }
   }
 
@@ -3860,8 +4271,8 @@ class FindBar {
       this.matches = [];
       this.currentIdx = -1;
       this._setCounter('—');
-      this.app.srcEd.clearMatchOverlays();
-      this.app.outEd.clearMatchOverlays();
+      if(this.app.srcEd) this.app.srcEd.clearMatchOverlays();
+      if(this.app.outEd) this.app.outEd.clearMatchOverlays();
       return;
     }
     const flags = this.getFlags();
@@ -3870,13 +4281,13 @@ class FindBar {
     }catch(e){
       this.matches = [];
       this._setCounter('Regex نامعتبر', 'none');
-      this.app.outEd.clearMatchOverlays();
+      if(this.app.outEd) this.app.outEd.clearMatchOverlays();
       return;
     }
     if(this.matches.length === 0){
       this.currentIdx = -1;
       this._setCounter('0 مطابقت', 'none');
-      this.app.outEd.clearMatchOverlays();
+      if(this.app.outEd) this.app.outEd.clearMatchOverlays();
       return;
     }
     if(this.currentIdx < 0 || this.currentIdx >= this.matches.length) this.currentIdx = 0;
@@ -3889,8 +4300,7 @@ class FindBar {
     const outEd = this.app.outEd;
     if(!outEd) return;
 
-    // ✅ فیلتر matches نامعتبر
-    const validMatches = this.matches.filter(m => 
+    const validMatches = this.matches.filter(m =>
       m && typeof m.index === 'number' && m.index >= 0
     );
 
@@ -3908,7 +4318,7 @@ class FindBar {
       }
     }
   }
-  
+
   _setCounter(text, cls){
     this.counter.textContent = text;
     this.counter.classList.remove('has', 'none');
@@ -3939,16 +4349,6 @@ class FindBar {
     Toast.info(n + ' مطابقت یافت شد');
   }
 
-  replaceOne(){
-    const find = this.findInput.value;
-    if(!find){ Toast.warn('فیلد Find خالی است'); return; }
-    try{
-      const r = this.app.finder.replace(this._currentText(), find, this.replInput.value, this.getFlags(), 1);
-      if(!r.count){ Toast.warn('موردی یافت نشد'); return; }
-      this._applyChange(r.text, 'جایگزینی یک مورد');
-    }catch(e){ Toast.err('خطا: ' + e.message); }
-  }
-
   replaceAll(){
     const find = this.findInput.value;
     if(!find){ Toast.warn('فیلد Find خالی است'); return; }
@@ -3971,7 +4371,7 @@ class FindBar {
     };
     if(flags.regex){
       cmd.pattern = find;
-      cmd.flags = (flags.caseSensitive ? '' : 'i') + (flags.multiline ? 's' : '') + 'g';
+      cmd.flags = this._getRegexFlags();
     } else {
       cmd.find = find;
     }
@@ -4021,8 +4421,8 @@ class FindBar {
     this._setCounter('—');
     this.preview.classList.remove('open');
     this.preview.innerHTML = '';
-    this.app.srcEd.clearMatchOverlays();
-    this.app.outEd.clearMatchOverlays();
+    if(this.app.srcEd) this.app.srcEd.clearMatchOverlays();
+    if(this.app.outEd) this.app.outEd.clearMatchOverlays();
     this._save();
   }
 
@@ -4221,10 +4621,18 @@ class ResultsPanel {
     const fb = this.app.findBar;
     if(!fb) return;
 
-    // ✅ ارسال کامل به FindBar
+    // ۱. هدف
+    if(cmd.target){
+      fb.targetSelect.value = cmd.target;
+    } else {
+      fb.targetSelect.value = 'text';
+    }
 
-    // ۱. اکشن
-    if(cmd.action && fb.actionSelect){
+    // ۲. به‌روزرسانی UI (اکشن‌های داینامیک)
+    fb._updateUIRows();
+
+    // ۳. اکشن
+    if(cmd.action){
       const actionMap = {
         'replace': 'replace',
         'replaceAll': 'replaceAll',
@@ -4236,53 +4644,53 @@ class ResultsPanel {
         'replaceFunction': 'replaceFunction',
         'replaceElement': 'replaceElement'
       };
-      if(actionMap[cmd.action]) fb.actionSelect.value = actionMap[cmd.action];
+      if(actionMap[cmd.action]){
+        fb.actionSelect.value = actionMap[cmd.action];
+        // دوباره UI را به‌روز کن (چون اکشن عوض شد)
+        fb._updateUIRows();
+      }
     }
 
-    // ۲. هدف
-    if(cmd.target && fb.targetSelect){
-      fb.targetSelect.value = cmd.target;
-    } else if(fb.targetSelect){
-      fb.targetSelect.value = 'text';
-    }
-
-    // ۳. Find / Pattern
-    const findStr = cmd.find != null ? String(cmd.find) : (cmd.pattern != null ? String(cmd.pattern) : '');
+    // ۴. Find / Pattern
+    const findStr = cmd.find != null ? String(cmd.find) :
+                    (cmd.pattern != null ? String(cmd.pattern) : '');
     if(findStr) fb.findInput.value = findStr;
 
-    // ۴. Replace
+    // ۵. Replace
     if(cmd.replace != null) fb.replInput.value = String(cmd.replace);
 
-    // ۵. Insert (اگر بود)
+    // ۶. Insert (اگر بود)
     if(cmd.insert != null && fb.insertInput) fb.insertInput.value = String(cmd.insert);
 
-    // ۶. Target Name
+    // ۷. Target Name
     if(cmd.targetName && fb.targetName) fb.targetName.value = cmd.targetName;
 
-    // ۷. IN_CLASS
+    // ۸. IN_CLASS
     if(cmd.inClass && fb.inClassInput) fb.inClassInput.value = cmd.inClass;
 
-    // ۸. پرچم‌ها
+    // ۹. پرچم‌ها
     if(cmd.pattern != null && fb.flagRegex) fb.flagRegex.checked = true;
     if(cmd.flags){
       if(fb.flagCase) fb.flagCase.checked = !cmd.flags.includes('i');
       if(fb.flagMulti) fb.flagMulti.checked = cmd.flags.includes('s');
     }
 
-    // ۹. به‌روزرسانی UI
-    if(fb._updateUIRows) fb._updateUIRows();
+    // ۱۰. به‌روزرسانی نهایی UI
+    fb._updateUIRows();
 
-    // ۱۰. به حالت ساده برو
+    // ۱۱. به حالت ساده برو
     if(this.app.state.ui.mode !== 'simple'){
       this.app._applyMode('simple');
     }
 
-    // ۱۱. رفرش
+    // ۱۲. رفرش مطابقت‌ها (اگر متنی)
     setTimeout(() => {
-      if(fb._refreshMatches) fb._refreshMatches();
+      if(fb._refreshMatches && !cmd.target){
+        fb._refreshMatches();
+      }
     }, 150);
 
-    // ۱۲. اسکرول
+    // ۱۳. اسکرول
     const findBar = Utils.$('#findBar');
     if(findBar) findBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
