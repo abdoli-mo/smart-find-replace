@@ -716,6 +716,69 @@ pre.code-demo{background:var(--panel3);border:1px solid var(--border);border-rad
   padding:12px;color:var(--muted);font-size:11.5px;text-align:center;
 }
 
+/* Result items برای Get/Count */
+.ritem .r-code{
+  background:#0d1018;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:8px 10px;
+  margin-top:6px;
+  font-family:var(--mono);
+  font-size:11.5px;
+  line-height:1.5;
+  direction:ltr;
+  text-align:left;
+  max-height:200px;
+  overflow:auto;
+  white-space:pre;
+  color:#cfe0ff;
+  position:relative;
+}
+.ritem .r-code .copy-floating{
+  position:absolute;
+  top:4px;
+  right:4px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:2px 6px;
+  cursor:pointer;
+  font-size:10px;
+  color:var(--muted);
+  opacity:0;
+  transition:.15s;
+}
+.ritem .r-code:hover .copy-floating{opacity:1}
+.ritem .r-code .copy-floating:hover{
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+}
+.ritem .r-list{
+  margin-top:6px;
+  font-family:var(--mono);
+  font-size:11.5px;
+  direction:ltr;
+  text-align:left;
+  color:#cfe0ff;
+  background:#0d1018;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:6px 10px;
+  max-height:200px;
+  overflow:auto;
+}
+.ritem .r-list .item{
+  padding:2px 0;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.ritem .r-list .item:last-child{border-bottom:0}
+.ritem .r-list .item .line{
+  color:var(--muted);
+  font-size:10px;
+  margin-left:8px;
+}
+
 @media (max-width:768px){
   .fr-target-row{grid-template-columns:1fr;gap:6px}
   .fr-target-row label{font-size:11px}
@@ -3799,6 +3862,8 @@ class CommandsHighlighter {
    CLASS 7 · FindBar — نوار Find/Replace پیشرفته
 /* ============================================================
    CLASS · FindBar — نسخه‌ی جدید (داینامیک)
+/* ============================================================
+   CLASS · FindBar — نسخه‌ی نهایی
    ============================================================ */
 class FindBar {
   constructor(app){
@@ -3838,7 +3903,6 @@ class FindBar {
   _bind(){
     const self = this;
 
-    // focus بزرگ شد
     [this.findInput, this.replInput, this.insertInput].forEach(el => {
       if(!el) return;
       el.addEventListener('focus', () => {
@@ -3850,24 +3914,18 @@ class FindBar {
       });
     });
 
-    // Action change
     this.actionSelect.addEventListener('change', () => self._updateUIRows());
-
-    // Target change
     this.targetSelect.addEventListener('change', () => self._updateUIRows());
 
-    // Autocomplete
     this._bindAutocomplete(this.targetName, this.suggestions, 'target');
     this._bindAutocomplete(this.inClassInput, this.suggestClasses, 'class');
 
-    // Matches refresh
     const onAny = Utils.debounce(() => self._refreshMatches(), 180);
     this.findInput.addEventListener('input', onAny);
     this.replInput.addEventListener('input', () => self._save());
     [this.flagRegex, this.flagCase, this.flagIndnt, this.flagMulti]
       .forEach(el => el.addEventListener('change', () => { onAny(); self._save(); }));
 
-    // دکمه‌ها
     Utils.$('#btnFindNext').addEventListener('click', () => self.next());
     Utils.$('#btnFindPrev').addEventListener('click', () => self.prev());
     Utils.$('#btnReplaceAll').addEventListener('click', () => self.replaceAll());
@@ -3879,134 +3937,63 @@ class FindBar {
     if(this.analyzeBtn) this.analyzeBtn.addEventListener('click', () => self._analyze());
   }
 
-  /**
-   * ✅ به‌روزرسانی UI بر اساس اکشن و هدف (اکشن اول)
-   * اکشن تعیین می‌کند هدف چه باشد
-   */
   _updateUIRows(){
     const action = this.actionSelect.value;
-
-    // ✅ اکشن تعیین می‌کند هدف چه باشد
-    // اگر اکشن "قفل‌شده" به یک هدف است، آن را اعمال کن
-    if(this._isLockedAction(action)){
-      const lockedTarget = this._getLockedTarget(action);
-      if(this.targetSelect.value !== lockedTarget){
-        this.targetSelect.value = lockedTarget;
-      }
-      // غیرفعال کردن dropdown هدف
-      this.targetSelect.disabled = true;
-      this.targetSelect.classList.add('fr-locked');
-    } else {
-      // هدف فعال
-      this.targetSelect.disabled = false;
-      this.targetSelect.classList.remove('fr-locked');
-    }
-
-    // حالا هدف فعلی را بخوان
     const target = this.targetSelect.value;
     const isTextTarget = (target === 'text');
+    const isRegex = (action === 'replaceRegex');
 
-    // ردیف هدف/زمینه
-    this.targetRow.style.display = isTextTarget ? 'none' : 'grid';
-
-    // ردیف Find/Replace
-    this.textRow.style.display = isTextTarget ? 'grid' : 'none';
-
-    // ردیف Insert/Replace
-    // ✅ نمایش برای همه‌ی اکشن‌ها وقتی هدف ≠ متن
-    const needsContent = (
-      action === 'replace' ||
-      action === 'replaceAll' ||
-      action === 'replaceClass' ||
-      action === 'replaceFunction' ||
-      action === 'replaceElement' ||
-      action === 'insertBefore' ||
-      action === 'insertAfter'
-    );
-    this.insertRow.style.display = (!isTextTarget && needsContent) ? 'grid' : 'none';
-
-    // برچسب Insert
-    const label = Utils.$('#frInsertLabel');
-    if(label){
-      const labelMap = {
-        insertBefore: 'متن درج قبل',
-        insertAfter: 'متن درج بعد',
-        replace: 'متن جایگزین',
-        replaceAll: 'متن جایگزین',
-        replaceClass: 'کلاس جدید',
-        replaceFunction: 'متد جدید',
-        replaceElement: 'المان جدید'
-      };
-      label.textContent = labelMap[action] || 'متن';
+    if(isRegex && !isTextTarget){
+      Toast.warn('replaceRegex فقط با هدف «متن» کار می‌کند');
+      this.targetSelect.value = 'text';
+      return this._updateUIRows();
     }
 
-    // فعال/غیرفعال کردن دکمه‌های ناوبری
+    this.targetRow.style.display = isTextTarget ? 'none' : 'grid';
+
+    const isTextAction = (action === 'replaceAll' || action === 'replace' || action === 'replaceRegex');
+    const isTextInsert = ((action === 'insertBefore' || action === 'insertAfter' || action === 'delete') && isTextTarget);
+
+    this.textRow.style.display = (isTextTarget && isTextAction) || isTextInsert ? 'grid' : 'none';
+
+    const replField = this.replInput ? this.replInput.closest('.fr-field') : null;
+    if(replField){
+      replField.style.display = isTextInsert ? 'none' : '';
+    }
+
+    const needsContent = (
+      (action === 'insertBefore' || action === 'insertAfter') && !isTextTarget
+    ) || (
+      (action === 'replaceAll' || action === 'replace') && !isTextTarget
+    );
+    this.insertRow.style.display = needsContent ? 'grid' : 'none';
+
+    const label = Utils.$('#frInsertLabel');
+    if(label){
+      let labelText = 'متن درج';
+      if(action === 'insertBefore' && !isTextTarget) labelText = 'متن درج قبل از ' + target;
+      else if(action === 'insertAfter' && !isTextTarget) labelText = 'متن درج بعد از ' + target;
+      else if(action === 'replaceAll' || action === 'replace'){
+        if(target === 'class') labelText = 'کلاس جدید';
+        else if(target === 'function') labelText = 'متد جدید';
+        else if(target === 'element') labelText = 'المان جدید';
+      }
+      label.textContent = labelText;
+    }
+
+    const findLabel = Utils.$('#frFindLabel');
+    if(findLabel){
+      if(action === 'insertBefore') findLabel.textContent = 'Find (متن مرجع)';
+      else if(action === 'insertAfter') findLabel.textContent = 'Find (متن مرجع)';
+      else if(action === 'delete') findLabel.textContent = 'Find (متن برای حذف)';
+      else findLabel.textContent = 'Find (متن جستجو)';
+    }
+
     const navBtns = ['#btnFindPrev', '#btnFindNext', '#btnCount', '#btnPreview'];
     navBtns.forEach(sel => {
       const el = Utils.$(sel);
       if(el) el.disabled = !isTextTarget;
     });
-  }
-
-  /**
-   * چک کن آیا اکشن به یک هدف خاص قفل است
-   * ✅ فقط replaceRegex روی متن قفل است
-   */
-  _isLockedAction(action){
-    return action === 'replaceRegex';
-  }
-
-  /**
-   * هدف قفل‌شده برای اکشن
-   */
-  _getLockedTarget(action){
-    if(action === 'replaceRegex') return 'text';
-    return null;
-  }
-  /**
-   * بازسازی Dropdown اکشن بر اساس هدف
-   */
-  _rebuildActionOptions(target){
-    const sel = this.actionSelect;
-    const current = sel.value;
-
-    let options = '';
-
-    if(target === 'text'){
-      options = `
-        <option value="replaceAll">replaceAll — جایگزینی همه</option>
-        <option value="replace">replace — جایگزینی اولین</option>
-        <option value="replaceRegex">replaceRegex — Regex</option>
-      `;
-    } else if(target === 'class'){
-      options = `
-        <option value="replaceClass">replaceClass — جایگزینی کلاس</option>
-        <option value="insertBefore">insertBefore — درج قبل</option>
-        <option value="insertAfter">insertAfter — درج بعد</option>
-        <option value="delete">delete — حذف</option>
-      `;
-    } else if(target === 'function'){
-      options = `
-        <option value="replaceFunction">replaceFunction — جایگزینی متد</option>
-        <option value="insertBefore">insertBefore — درج قبل</option>
-        <option value="insertAfter">insertAfter — درج بعد</option>
-        <option value="delete">delete — حذف</option>
-      `;
-    } else if(target === 'element'){
-      options = `
-        <option value="replaceElement">replaceElement — جایگزینی المان</option>
-        <option value="insertBefore">insertBefore — درج قبل</option>
-        <option value="insertAfter">insertAfter — درج بعد</option>
-        <option value="delete">delete — حذف</option>
-      `;
-    }
-
-    sel.innerHTML = options;
-
-    // تلاش برای حفظ اکشن قبلی
-    if([].some.call(sel.options, o => o.value === current)){
-      sel.value = current;
-    }
   }
 
   _bindAutocomplete(input, list, type){
@@ -4090,7 +4077,7 @@ class FindBar {
     const lowerQuery = query.toLowerCase();
     const targetType = (type === 'target') ? this.targetSelect.value : 'class';
 
-    if(targetType === 'class' || targetType === 'text' || !targetType){
+    if(targetType === 'class' || !targetType){
       const re = /\bclass\s+([A-Za-z_$][\w$]*)/g;
       let m;
       while((m = re.exec(source))){
@@ -4145,55 +4132,59 @@ class FindBar {
     });
   }
 
-  /**
-   * ساخت cmd از فیلدهای FindBar
-   * ✅ ترجمه‌ی اکشن + هدف به اکشن نهایی
-   */
   _buildCommand(){
     const action = this.actionSelect.value;
     const target = this.targetSelect.value;
+    const cmd = {};
 
-    // ✅ مرحله ۱: ترجمه‌ی اکشن بر اساس هدف
-    let finalAction = action;
-
-    if(target !== 'text'){
-      // هدف ≠ متن
-      if(action === 'replace' || action === 'replaceAll'){
-        // replace/replaceAll + هدف ≠ متن → replaceClass/Function/Element
-        if(target === 'class') finalAction = 'replaceClass';
-        else if(target === 'function') finalAction = 'replaceFunction';
-        else if(target === 'element') finalAction = 'replaceElement';
-      }
-      // insertBefore/insertAfter/delete → همان‌ها می‌مانند
-    } else {
-      // هدف = متن
-      // replaceClass/Function/Element (اگر از _sendToFind بیاید) → replace
-      if(action === 'replaceClass' || action === 'replaceFunction' || action === 'replaceElement'){
-        finalAction = 'replace';
-      }
+    if(action === 'replaceRegex' && target !== 'text'){
+      return { _error: 'replaceRegex فقط با هدف «متن» کار می‌کند' };
     }
 
-    const cmd = { action: finalAction };
-
-    if(target === 'text'){
-      cmd.find = this.findInput.value;
-      if(action === 'replaceRegex'){
-        cmd.pattern = this.findInput.value;
-        cmd.flags = this._getRegexFlags();
-        delete cmd.find;
-      }
-      cmd.replace = this.replInput.value;
-    } else {
-      cmd.target = target;
-      cmd.targetName = this.targetName.value.trim();
-      if(this.inClassInput.value.trim()){
-        cmd.inClass = this.inClassInput.value.trim();
-      }
-      if(action === 'insertBefore' || action === 'insertAfter'){
-        cmd.insert = this.insertInput.value;
-      } else {
-        // replace/replaceAll + هدف ≠ متن → replace
+    if(action === 'replaceAll' || action === 'replace' || action === 'replaceRegex'){
+      if(target === 'text'){
+        cmd.action = action;
+        if(action === 'replaceRegex'){
+          cmd.pattern = this.findInput.value;
+          cmd.flags = this._getRegexFlags();
+        } else {
+          cmd.find = this.findInput.value;
+        }
+        cmd.replace = this.replInput.value;
+      } else if(target === 'class'){
+        cmd.action = 'replaceClass';
+        cmd.className = this.targetName.value.trim();
         cmd.replace = this.insertInput.value;
+        if(this.inClassInput.value.trim()) cmd.inClass = this.inClassInput.value.trim();
+      } else if(target === 'function'){
+        cmd.action = 'replaceFunction';
+        cmd.functionName = this.targetName.value.trim();
+        cmd.replace = this.insertInput.value;
+        if(this.inClassInput.value.trim()) cmd.inClass = this.inClassInput.value.trim();
+      } else if(target === 'element'){
+        cmd.action = 'replaceElement';
+        cmd.selector = this.targetName.value.trim();
+        cmd.replace = this.insertInput.value;
+        if(this.inClassInput.value.trim()) cmd.inSelector = this.inClassInput.value.trim();
+      }
+    } else if(action === 'insertBefore' || action === 'insertAfter'){
+      cmd.action = action;
+      if(target === 'text'){
+        cmd.find = this.findInput.value;
+      } else {
+        cmd.target = target;
+        cmd.targetName = this.targetName.value.trim();
+        if(this.inClassInput.value.trim()) cmd.inClass = this.inClassInput.value.trim();
+      }
+      cmd.insert = this.insertInput.value;
+    } else if(action === 'delete'){
+      cmd.action = 'delete';
+      if(target === 'text'){
+        cmd.find = this.findInput.value;
+      } else {
+        cmd.target = target;
+        cmd.targetName = this.targetName.value.trim();
+        if(this.inClassInput.value.trim()) cmd.inClass = this.inClassInput.value.trim();
       }
     }
 
@@ -4208,46 +4199,37 @@ class FindBar {
   }
 
   _execute(){
-    const target = this.targetSelect.value;
     const cmd = this._buildCommand();
+    if(cmd._error){ Toast.err(cmd._error); return; }
 
-    // اعتبارسنجی
     const errors = this.app.parser.validate(cmd);
-    if(errors.length){
-      Toast.err(errors.join(' · '));
-      return;
-    }
+    if(errors.length){ Toast.err(errors.join(' · ')); return; }
 
-    // preflight
     const pre = this.app.runner.preflight(cmd, this.app.state.current, this.app.state.settings);
 
-    if(pre.kind === 'error'){
-      Toast.err(pre.message);
-      return;
-    }
-    if(pre.kind === 'mismatch'){
-      Toast.warn('انتظار: ' + pre.expectDesc + ' — یافت: ' + pre.found);
-      // ادامه می‌دهیم — به عنوان نتیجه ثبت می‌شود
-    }
-    if(pre.kind === 'warn'){
-      Toast.warn(pre.message);
-    }
-    if(pre.kind === 'ask'){
-      Toast.warn(pre.found + ' مورد یافت شد — اولین مورد اعمال می‌شود');
-    }
+    if(pre.kind === 'error'){ Toast.err(pre.message); return; }
+    if(pre.kind === 'mismatch'){ Toast.warn('انتظار: ' + pre.expectDesc + ' — یافت: ' + pre.found); }
+    if(pre.kind === 'warn'){ Toast.warn(pre.message); }
+    if(pre.kind === 'ask'){ Toast.warn(pre.found + ' مورد یافت شد'); }
 
-    // اجرا
     const before = this.app.state.current;
     const res = this.app.runner.runOne(cmd, before, this.app.state.settings);
 
     if(res.ok){
-      this.app.state.current = res.text;
-      this.app._setOutput(res.text);
-      this.app._pushResult(cmd, res, before);
-      this.app._refreshStats(res.ms);
-      this.app._saveSession();
-      Toast.ok(res.message);
-      if(target === 'text') this._refreshMatches();
+      if(res.status === 'info'){
+        // اکشن اطلاعاتی — متن تغییر نمی‌کند
+        this.app._pushResult(cmd, res, before);
+        this.app._refreshStats(res.ms);
+        Toast.ok(res.message);
+      } else {
+        this.app.state.current = res.text;
+        this.app._setOutput(res.text);
+        this.app._pushResult(cmd, res, before);
+        this.app._refreshStats(res.ms);
+        this.app._saveSession();
+        Toast.ok(res.message);
+        if(this.targetSelect.value === 'text') this._refreshMatches();
+      }
     } else {
       this.app._pushResult(cmd, res, before);
       Toast.err(res.message);
@@ -4256,26 +4238,18 @@ class FindBar {
 
   _analyze(){
     const cmd = this._buildCommand();
+    if(cmd._error){ Toast.err(cmd._error); return; }
 
     const errors = this.app.parser.validate(cmd);
-    if(errors.length){
-      Toast.err(errors.join(' · '));
-      return;
-    }
+    if(errors.length){ Toast.err(errors.join(' · ')); return; }
 
     const pre = this.app.runner.preflight(cmd, this.app.state.current, this.app.state.settings);
 
-    if(pre.kind === 'ok'){
-      Toast.ok('✅ قابل اجرا');
-    } else if(pre.kind === 'warn'){
-      Toast.warn('⚠️ ' + (pre.message || 'هشدار'));
-    } else if(pre.kind === 'mismatch'){
-      Toast.err('❌ انتظار: ' + pre.expectDesc + ' — یافت: ' + pre.found);
-    } else if(pre.kind === 'ask'){
-      Toast.warn('⚠️ ' + pre.found + ' مورد یافت شد');
-    } else if(pre.kind === 'error'){
-      Toast.err('❌ ' + pre.message);
-    }
+    if(pre.kind === 'ok'){ Toast.ok('✅ قابل اجرا'); }
+    else if(pre.kind === 'warn'){ Toast.warn('⚠️ ' + (pre.message || 'هشدار')); }
+    else if(pre.kind === 'mismatch'){ Toast.err('❌ انتظار: ' + pre.expectDesc + ' — یافت: ' + pre.found); }
+    else if(pre.kind === 'ask'){ Toast.warn('⚠️ ' + pre.found + ' مورد یافت شد'); }
+    else if(pre.kind === 'error'){ Toast.err('❌ ' + pre.message); }
   }
 
   getFlags(){
@@ -4287,9 +4261,7 @@ class FindBar {
     };
   }
 
-  _currentText(){
-    return this.app.state.current || '';
-  }
+  _currentText(){ return this.app.state.current || ''; }
 
   _refreshMatches(){
     const find = this.findInput.value;
@@ -4329,11 +4301,7 @@ class FindBar {
     const validMatches = this.matches.filter(m =>
       m && typeof m.index === 'number' && m.index >= 0
     );
-
-    if(!validMatches.length){
-      outEd.clearMatchOverlays();
-      return;
-    }
+    if(!validMatches.length){ outEd.clearMatchOverlays(); return; }
 
     outEd.showMatchOverlays(validMatches, this.currentIdx);
 
@@ -4600,8 +4568,8 @@ class ResultsPanel {
       return;
     }
 
-    const ICON = { ok:'✅', warn:'⚠️', notfound:'❌', error:'❌', pending:'⏸', mismatch:'🎯', skipped:'⏭' };
-    const LABEL = { ok:'موفق', warn:'هشدار', notfound:'یافت نشد', error:'خطا', pending:'در انتظار', mismatch:'عدم تطابق', skipped:'رد شده' };
+    const ICON = { ok:'✅', warn:'⚠️', notfound:'❌', error:'❌', pending:'⏸', mismatch:'🎯', skipped:'⏭', info:'ℹ️' };
+    const LABEL = { ok:'موفق', warn:'هشدار', notfound:'یافت نشد', error:'خطا', pending:'در انتظار', mismatch:'عدم تطابق', skipped:'رد شده', info:'اطلاعات' };
 
     let text = '═══════════════════════════════════════════════\n';
     text += '📊 گزارش نتایج — ' + new Date().toLocaleString('fa-IR') + '\n';
@@ -4728,8 +4696,8 @@ class ResultsPanel {
       this.list.innerHTML = '<div class="empty">هنوز دستوری اجرا نشده است.</div>';
       return;
     }
-    const ICON = { ok:'✅', warn:'⚠️', notfound:'❌', error:'❌', pending:'⏸', mismatch:'🎯', skipped:'⏭' };
-    const LABEL = { ok:'موفق', warn:'هشدار', notfound:'یافت نشد', error:'خطا', pending:'در انتظار', mismatch:'عدم تطابق', skipped:'رد شده' };
+    const ICON = { ok:'✅', warn:'⚠️', notfound:'❌', error:'❌', pending:'⏸', mismatch:'🎯', skipped:'⏭', info:'ℹ️' };
+    const LABEL = { ok:'موفق', warn:'هشدار', notfound:'یافت نشد', error:'خطا', pending:'در انتظار', mismatch:'عدم تطابق', skipped:'رد شده', info:'اطلاعات' };
 
     this.list.innerHTML = results.map((r, i) => {
       const cmd = r.cmd || {};
@@ -4794,6 +4762,51 @@ class ResultsPanel {
         '</div>';
       }
 
+      // ✅ اطلاعات اضافی (Get/Count/GetAll)
+      let infoBlock = '';
+      if(r.info){
+        const info = r.info;
+
+        if(info.type === 'count'){
+          infoBlock = '<div class="r-code">' +
+            Utils.esc(String(info.value)) +
+            '<button class="copy-floating" data-copy="' + Utils.esc(String(info.value)) + '">📋</button>' +
+          '</div>';
+        } else if(info.type === 'get'){
+          infoBlock = '<div class="r-code">' +
+            Utils.esc(info.value) +
+            '<button class="copy-floating" data-copy="' + Utils.esc(info.value) + '">📋</button>' +
+          '</div>';
+        } else if(info.type === 'getAll'){
+          const itemsHtml = info.items.map((it, k) =>
+            '<div class="item">' +
+              Utils.esc(String(it.name || '') || 'مورد ' + (k + 1)) +
+              '<span class="line">خط ' + it.line + '</span>' +
+            '</div>'
+          ).join('');
+          const fullText = info.items.map(it => it.content).join('\n\n/* --- */\n\n');
+          infoBlock = '<div class="r-list">' + itemsHtml +
+            '<button class="copy-floating" data-copy="' + Utils.esc(fullText) + '">📋</button>' +
+          '</div>';
+        } else if(info.type === 'getName'){
+          const namesHtml = info.names.map((n, k) =>
+            '<div class="item">' + (k + 1) + '. ' + Utils.esc(n || '(بی‌نام)') + '</div>'
+          ).join('');
+          infoBlock = '<div class="r-list">' + namesHtml +
+            '<button class="copy-floating" data-copy="' + Utils.esc(info.names.join('\n')) + '">📋</button>' +
+          '</div>';
+        } else if(info.type === 'getAddress'){
+          const addrHtml = info.addresses.map((a, k) =>
+            '<div class="item">' + (k + 1) + '. start=' + a.start + ', end=' + a.end +
+            ' <span class="line">خط ' + a.line + ' تا ' + a.endLine + '</span></div>'
+          ).join('');
+          const txt = info.addresses.map(a => a.start + '-' + a.end).join('\n');
+          infoBlock = '<div class="r-list">' + addrHtml +
+            '<button class="copy-floating" data-copy="' + Utils.esc(txt) + '">📋</button>' +
+          '</div>';
+        }
+      }
+
       return '<div class="ritem' + active + '" data-i="' + i + '">' +
         '<div class="r1">' +
           '<span>' + ic + '</span>' +
@@ -4807,6 +4820,7 @@ class ResultsPanel {
         contextBlock +
         '<div class="r2">' + Utils.esc(r.message || '') + '</div>' +
         frBlock +
+        infoBlock +
         actionBlock +
         '<div class="r3">' + [lineTxt, cnt, Utils.fmtTime(r.ms)].filter(Boolean).join(' · ') + '</div>' +
       '</div>';
@@ -5075,30 +5089,128 @@ class CommandParser {
     if(b.ACTION){
       const actionStr = b.ACTION.trim();
 
-      // ✅ تشخیص ACTION با هدف: insertBeforeClass Foo / insertAfterFunction Bar / deleteClass Baz
-      const mTarget = /^(insertBefore|insertAfter|delete)(Class|Function|Element)\s+(\S.*)$/i.exec(actionStr);
-      if(mTarget){
-        const verb = mTarget[1].toLowerCase();
-        cmd.action = verb === 'insertbefore' ? 'insertBefore'
-                   : verb === 'insertafter'  ? 'insertAfter'
-                   : 'delete';
-        cmd.target = mTarget[2].toLowerCase();   // 'class' | 'function' | 'element'
-        cmd.targetName = mTarget[3].trim();      // UserService / Fibonacci / #app
-      } else {
-        // رفتار قبلی
-        cmd.action = actionStr.toLowerCase()
-          .replace(/^replaceall$/, 'replaceAll')
-          .replace(/^replaceallregex$/, 'replaceRegex')
-          .replace(/^replaceregex$/, 'replaceRegex')
-          .replace(/^insertafter$/, 'insertAfter')
-          .replace(/^insertbefore$/, 'insertBefore')
-          .replace(/^replaceclass$/, 'replaceClass')
-          .replace(/^replacefunction$/, 'replaceFunction')
-          .replace(/^replaceelement$/, 'replaceElement')
-          .replace(/^replacecssblock$/, 'replaceCSSBlock')
-          .replace(/^replacecss$/, 'replaceCSSBlock')
-          .replace(/^insertcss$/, 'insertCSS')
-          .replace(/^inserthtml$/, 'insertHTML');
+      // ✅ حالت ۱: نام‌گذاری دوگانه با فاصله (replace Class Foo)
+      const mSpace = /^(replace|insert|delete|count|get|getAll|getName|getAddress)\s+(text|class|function|element)\s*(.*)$/i.exec(actionStr);
+      if(mSpace){
+        const verb = mSpace[1].toLowerCase();
+        const target = mSpace[2].toLowerCase();
+        const targetName = mSpace[3].trim();
+
+        if(verb === 'replace'){
+          cmd.action = target === 'text' ? 'replaceAll'
+                     : target === 'class' ? 'replaceClass'
+                     : target === 'function' ? 'replaceFunction'
+                     : 'replaceElement';
+        } else if(verb === 'insert'){
+          cmd.action = 'insertBefore';  // پیش‌فرض
+        } else if(verb === 'delete'){
+          cmd.action = 'delete';
+          cmd.target = target;
+          if(targetName) cmd.targetName = targetName;
+        } else if(verb === 'count'){
+          cmd.action = 'count';
+          cmd.target = target;
+          if(targetName) cmd.targetName = targetName;
+        } else if(verb === 'get'){
+          cmd.action = 'get';
+          cmd.target = target;
+          if(targetName) cmd.targetName = targetName;
+        } else if(verb === 'getall'){
+          cmd.action = 'getAll';
+          cmd.target = target;
+          if(targetName) cmd.targetName = targetName;
+        } else if(verb === 'getname'){
+          cmd.action = 'getName';
+          cmd.target = target;
+          if(targetName) cmd.targetName = targetName;
+        } else if(verb === 'getaddress'){
+          cmd.action = 'getAddress';
+          cmd.target = target;
+          if(targetName) cmd.targetName = targetName;
+        }
+
+        // اگر replace class/function/element بود و targetName داد
+        if(cmd.action === 'replaceClass' && targetName) cmd.className = targetName;
+        if(cmd.action === 'replaceFunction' && targetName) cmd.functionName = targetName;
+        if(cmd.action === 'replaceElement' && targetName) cmd.selector = targetName;
+      }
+      // ✅ حالت ۲: نام‌گذاری فشرده (replaceClass Foo)
+      else {
+        const mCompact = /^(replaceClass|replaceFunction|replaceElement|insertBefore|insertAfter|deleteClass|deleteFunction|deleteElement|countClass|countFunction|countElement|countText|getClass|getFunction|getElement|getText|getAllClass|getAllFunction|getAllElement|getAllText|getNameClass|getNameFunction|getNameElement|getAddressClass|getAddressFunction|getAddressElement|insertBeforeClass|insertBeforeFunction|insertBeforeElement|insertAfterClass|insertAfterFunction|insertAfterElement)\s*(.*)$/i.exec(actionStr);
+
+        if(mCompact){
+          const rawAction = mCompact[1];
+          const targetName = mCompact[2].trim();
+          const lower = rawAction.toLowerCase();
+
+          // Map به اکشن و هدف
+          const map = {
+            'replaceclass': { action:'replaceClass', target:'class' },
+            'replacefunction': { action:'replaceFunction', target:'function' },
+            'replaceelement': { action:'replaceElement', target:'element' },
+            'insertbefore': { action:'insertBefore' },
+            'insertafter': { action:'insertAfter' },
+            'deleteclass': { action:'delete', target:'class' },
+            'deletefunction': { action:'delete', target:'function' },
+            'deleteelement': { action:'delete', target:'element' },
+            'countclass': { action:'count', target:'class' },
+            'countfunction': { action:'count', target:'function' },
+            'countelement': { action:'count', target:'element' },
+            'counttext': { action:'count', target:'text' },
+            'getclass': { action:'get', target:'class' },
+            'getfunction': { action:'get', target:'function' },
+            'getelement': { action:'get', target:'element' },
+            'gettext': { action:'get', target:'text' },
+            'getallclass': { action:'getAll', target:'class' },
+            'getallfunction': { action:'getAll', target:'function' },
+            'getallelement': { action:'getAll', target:'element' },
+            'getalltext': { action:'getAll', target:'text' },
+            'getnameclass': { action:'getName', target:'class' },
+            'getnamefunction': { action:'getName', target:'function' },
+            'getnameelement': { action:'getName', target:'element' },
+            'getaddressclass': { action:'getAddress', target:'class' },
+            'getaddressfunction': { action:'getAddress', target:'function' },
+            'getaddresselement': { action:'getAddress', target:'element' }
+          };
+
+          const info = map[lower];
+          if(info){
+            cmd.action = info.action;
+            if(info.target) cmd.target = info.target;
+            if(targetName){
+              if(info.target === 'class') cmd.className = targetName;
+              else if(info.target === 'function') cmd.functionName = targetName;
+              else if(info.target === 'element') cmd.selector = targetName;
+              else cmd.targetName = targetName;
+            }
+          }
+        }
+        // ✅ حالت ۳: نام‌گذاری اصلی
+        else {
+          const mTarget = /^(insertBefore|insertAfter|delete)(Class|Function|Element)\s+(\S.*)$/i.exec(actionStr);
+          if(mTarget){
+            const verb = mTarget[1].toLowerCase();
+            cmd.action = verb === 'insertbefore' ? 'insertBefore'
+                       : verb === 'insertafter'  ? 'insertAfter'
+                       : 'delete';
+            cmd.target = mTarget[2].toLowerCase();
+            cmd.targetName = mTarget[3].trim();
+          } else {
+            cmd.action = actionStr.toLowerCase()
+              .replace(/^replaceall$/, 'replaceAll')
+              .replace(/^replaceallregex$/, 'replaceRegex')
+              .replace(/^replaceregex$/, 'replaceRegex')
+              .replace(/^insertafter$/, 'insertAfter')
+              .replace(/^insertbefore$/, 'insertBefore')
+              .replace(/^replaceclass$/, 'replaceClass')
+              .replace(/^replacefunction$/, 'replaceFunction')
+              .replace(/^replaceelement$/, 'replaceElement')
+              .replace(/^replacecssblock$/, 'replaceCSSBlock')
+              .replace(/^replacecss$/, 'replaceCSSBlock')
+              .replace(/^insertcss$/, 'insertCSS')
+              .replace(/^inserthtml$/, 'insertHTML');
+          }
+        }
       }
     }
 
@@ -5669,6 +5781,11 @@ class CommandRunner {
 
     const a = String(cmd.action);
     try{
+      // ✅ اکشن‌های جدید: count / get / getAll / getName / getAddress
+      if(a === 'count' || a === 'get' || a === 'getAll' || a === 'getName' || a === 'getAddress'){
+        return finish(this._doInfoAction(cmd, text, settings));
+      }
+
       // ✅ اگر target مشخص است، از متد مخصوص استفاده کن
       if(cmd.target){
         if(a === 'insertBefore') return finish(this._doInsertByTarget(cmd, text, settings, 'before'));
@@ -5683,6 +5800,9 @@ class CommandRunner {
         case 'insertBefore':        return finish(this._doInsert(cmd, text, settings, 'before'));
         case 'insertAfter':         return finish(this._doInsert(cmd, text, settings, 'after'));
         case 'delete':              return finish(this._doDelete(cmd, text, settings));
+        case 'replaceClass':        return finish(this._doReplaceClass(cmd, text));
+        case 'replaceFunction':     return finish(this._doReplaceFunction(cmd, text));
+        case 'replaceElement':      return finish(this._doReplaceElement(cmd, text));
         case 'replaceClass':        return finish(this._doReplaceClass(cmd, text));
         case 'replaceFunction':     return finish(this._doReplaceFunction(cmd, text));
         case 'replaceElement':      return finish(this._doReplaceElement(cmd, text));
@@ -5977,6 +6097,128 @@ class CommandRunner {
     return i;
   }
 
+   /* ---------- Count / Get / GetAll / GetName / GetAddress ---------- */
+  _doInfoAction(cmd, text, settings){
+    const action = cmd.action;
+    const target = cmd.target || 'text';
+    const name = cmd.targetName ||
+                 (target === 'class' ? cmd.className :
+                 (target === 'function' ? cmd.functionName :
+                 (target === 'element' ? cmd.selector : '')));
+
+    // پیدا کردن موارد
+    let ranges = [];
+
+    if(target === 'class'){
+      if(cmd.inClass){
+        const outer = this.scanners.findClass(text, cmd.inClass);
+        if(outer){
+          const innerText = text.slice(outer[0], outer[1]);
+          const innerRanges = this.scanners.findAllClasses(innerText, name || '');
+          ranges = innerRanges.map(r => ({ start: outer[0] + r.start, end: outer[0] + r.end }));
+        }
+      } else if(name){
+        ranges = this.scanners.findAllClasses(text, name);
+      } else {
+        // همه‌ی کلاس‌ها
+        const re = /\bclass\s+([A-Za-z_$][\w$]*)/g;
+        let m;
+        const seen = new Set();
+        while((m = re.exec(text))){
+          if(seen.has(m[1])) continue;
+          seen.add(m[1]);
+          const r = this.scanners.findClass(text, m[1]);
+          if(r) ranges.push({ start: r[0], end: r[1], name: m[1] });
+        }
+      }
+    } else if(target === 'function'){
+      if(cmd.inClass){
+        const classRange = this.scanners.findClass(text, cmd.inClass);
+        if(classRange){
+          const innerText = text.slice(classRange[0], classRange[1]);
+          const innerRanges = this.scanners.findAllFunctions(innerText, name || '');
+          ranges = innerRanges.map(r => ({ start: classRange[0] + r.start, end: classRange[0] + r.end, name: name }));
+        }
+      } else if(name){
+        ranges = this.scanners.findAllFunctions(text, name);
+      }
+    } else if(target === 'element'){
+      if(name){
+        ranges = this.scanners.findAllElements(text, name);
+      }
+    } else if(target === 'text'){
+      const find = cmd.find || name || '';
+      if(find){
+        const occ = this.scanners.findOccurrences(text, find, settings.caseSensitive !== false);
+        ranges = occ.map(i => ({ start: i, end: i + find.length }));
+      }
+    }
+
+    // خروجی بر اساس action
+    if(action === 'count'){
+      const n = ranges.length;
+      return {
+        ok: true, text, status: 'info', count: n, index: -1, ms: 0,
+        info: { type: 'count', target, name, value: n },
+        message: '🔢 تعداد: ' + n + ' مورد'
+      };
+    }
+
+    if(action === 'get'){
+      if(!ranges.length){
+        return { ok:false, status:'notfound', text, message: 'موردی یافت نشد', count:0, index:-1 };
+      }
+      const r = ranges[0];
+      const content = text.slice(r.start, r.end);
+      return {
+        ok: true, text, status: 'info', count: 1, index: r.start, ms: 0,
+        info: { type: 'get', target, name, value: content },
+        message: '📄 متن گرفته شد (' + content.length + ' کاراکتر)'
+      };
+    }
+
+    if(action === 'getAll'){
+      const items = ranges.map(r => ({
+        content: text.slice(r.start, r.end),
+        start: r.start,
+        end: r.end,
+        name: r.name,
+        line: Utils.lineOf(text, r.start)
+      }));
+      return {
+        ok: true, text, status: 'info', count: items.length, index: -1, ms: 0,
+        info: { type: 'getAll', target, name, items },
+        message: '📄 ' + items.length + ' مورد یافت شد'
+      };
+    }
+
+    if(action === 'getName'){
+      const names = ranges.map(r => r.name || name);
+      return {
+        ok: true, text, status: 'info', count: names.length, index: -1, ms: 0,
+        info: { type: 'getName', target, names },
+        message: '📝 ' + names.length + ' نام'
+      };
+    }
+
+    if(action === 'getAddress'){
+      const addresses = ranges.map(r => ({
+        start: r.start,
+        end: r.end,
+        line: Utils.lineOf(text, r.start),
+        endLine: Utils.lineOf(text, r.end)
+      }));
+      return {
+        ok: true, text, status: 'info', count: addresses.length, index: -1, ms: 0,
+        info: { type: 'getAddress', target, addresses },
+        message: '📍 ' + addresses.length + ' آدرس'
+      };
+    }
+
+    return { ok:false, status:'error', text, message: 'اکشن نامعتبر: ' + action, count:0, index:-1 };
+  }
+
+  /* ---------- Insert/Delete By Target ---------- */
   _doInsertByTarget(cmd, text, settings, where){
     const name = cmd.targetName;
     const target = cmd.target;
